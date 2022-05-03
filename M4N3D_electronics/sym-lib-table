@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "ANALOG")(type "Legacy")(uri "${KIPRJMOD}/lib/COM-09032.lib")(options "")(descr ""))
+  (lib (name "DC-DC")(type "Legacy")(uri "${KIPRJMOD}/lib/DC-DC_module.lib")(options "")(descr ""))
+)
