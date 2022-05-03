@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "servo.h"
 
 /* USER CODE END Includes */
 
@@ -110,9 +110,17 @@ int main(void)
   HAL_Delay(1000);
   printf("System started\r\n");
 
+//  SRV_changeID(1, 3);
+
 
   while (1)
   {
+	//test move
+	SRV_move(3, 0, 200);
+	HAL_Delay(1000);
+	SRV_move(3, 50, 200);
+	HAL_Delay(1000);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -334,7 +342,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, EFFECTOR_LED_Pin|EFFECTOR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(EFFECTOR_GPIO_Port, EFFECTOR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -355,12 +363,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EFFECTOR_LED_Pin EFFECTOR_Pin */
-  GPIO_InitStruct.Pin = EFFECTOR_LED_Pin|EFFECTOR_Pin;
+  /*Configure GPIO pin : EFECTOR_Pin */
+  GPIO_InitStruct.Pin = EFFECTOR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  HAL_GPIO_Init(EFFECTOR_GPIO_Port, &GPIO_InitStruct);
 
 }
 
