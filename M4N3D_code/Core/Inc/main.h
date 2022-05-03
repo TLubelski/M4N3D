@@ -31,12 +31,14 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern ADC_HandleTypeDef hadc1;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -59,12 +61,30 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_3
-#define USART_RX_GPIO_Port GPIOA
+#define ANALOG_L_X_Pin GPIO_PIN_0
+#define ANALOG_L_X_GPIO_Port GPIOC
+#define ANALOG_L_Y_Pin GPIO_PIN_1
+#define ANALOG_L_Y_GPIO_Port GPIOC
+#define ANALOG_R_X_Pin GPIO_PIN_2
+#define ANALOG_R_X_GPIO_Port GPIOC
+#define ANALOG_R_Y_Pin GPIO_PIN_3
+#define ANALOG_R_Y_GPIO_Port GPIOC
+#define ANALOG_L_SW_Pin GPIO_PIN_0
+#define ANALOG_L_SW_GPIO_Port GPIOA
+#define ANALOG_R_SW_Pin GPIO_PIN_1
+#define ANALOG_R_SW_GPIO_Port GPIOA
+#define TTY_UART_TX_Pin GPIO_PIN_2
+#define TTY_UART_TX_GPIO_Port GPIOA
+#define TTY_UART_RX_Pin GPIO_PIN_3
+#define TTY_UART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define EFFECTOR_LED_Pin GPIO_PIN_6
+#define EFFECTOR_LED_GPIO_Port GPIOC
+#define EFFECTOR_Pin GPIO_PIN_7
+#define EFFECTOR_GPIO_Port GPIOC
+#define SRV_UART_RXTX_Pin GPIO_PIN_9
+#define SRV_UART_RXTX_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
