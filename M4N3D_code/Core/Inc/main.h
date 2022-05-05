@@ -61,14 +61,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
-#define ANALOG_L_X_Pin GPIO_PIN_0
-#define ANALOG_L_X_GPIO_Port GPIOC
-#define ANALOG_L_Y_Pin GPIO_PIN_1
-#define ANALOG_L_Y_GPIO_Port GPIOC
-#define ANALOG_R_X_Pin GPIO_PIN_2
-#define ANALOG_R_X_GPIO_Port GPIOC
-#define ANALOG_R_Y_Pin GPIO_PIN_3
-#define ANALOG_R_Y_GPIO_Port GPIOC
 #define ANALOG_L_SW_Pin GPIO_PIN_0
 #define ANALOG_L_SW_GPIO_Port GPIOA
 #define ANALOG_R_SW_Pin GPIO_PIN_1
