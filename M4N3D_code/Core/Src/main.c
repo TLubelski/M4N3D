@@ -121,13 +121,13 @@ int main(void)
   while (1)
   {
 	//test move
-	SRV_move(3, 0, 200);
-	HAL_Delay(1000);
-	SRV_move(3, 50, 200);
-	HAL_Delay(1000);
+//	SRV_move(3, 0, 200);
+//	HAL_Delay(1000);
+//	SRV_move(3, 50, 200);
+//	HAL_Delay(1000);
 
 	HAL_ADC_Start_DMA(&hadc1, data, 4);
-	printf("L_X: %d L_Y: %d R_X: %d, R_Y: %d", data[0], data[1], data[2], data[3]);
+	printf("L_X: %d L_Y: %d R_X: %d, R_Y: %d \n\r", data[0], data[1], data[2], data[3]);
 
     /* USER CODE END WHILE */
 
@@ -392,12 +392,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ANALOG_L_SW_Pin ANALOG_R_SW_Pin */
-  GPIO_InitStruct.Pin = ANALOG_L_SW_Pin|ANALOG_R_SW_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -410,6 +404,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ANALOG_L_SW_Pin ANALOG_R_SW_Pin */
+  GPIO_InitStruct.Pin = ANALOG_L_SW_Pin|ANALOG_R_SW_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 }
