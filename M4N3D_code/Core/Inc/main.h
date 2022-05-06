@@ -71,10 +71,10 @@ void Error_Handler(void);
 #define EFFECTOR_LED_GPIO_Port GPIOC
 #define EFFECTOR_Pin GPIO_PIN_7
 #define EFFECTOR_GPIO_Port GPIOC
-#define ANALOG_L_SW_Pin GPIO_PIN_8
-#define ANALOG_L_SW_GPIO_Port GPIOC
-#define ANALOG_R_SW_Pin GPIO_PIN_9
-#define ANALOG_R_SW_GPIO_Port GPIOC
+#define CON_L_SW_Pin GPIO_PIN_8
+#define CON_L_SW_GPIO_Port GPIOC
+#define CON_R_SW_Pin GPIO_PIN_9
+#define CON_R_SW_GPIO_Port GPIOC
 #define SRV_UART_RXTX_Pin GPIO_PIN_9
 #define SRV_UART_RXTX_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13

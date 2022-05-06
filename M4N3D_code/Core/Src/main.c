@@ -32,6 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,7 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 UART_HandleTypeDef huart1;
@@ -126,8 +127,15 @@ int main(void)
 //	SRV_move(3, 50, 200);
 //	HAL_Delay(1000);
 
-	HAL_ADC_Start_DMA(&hadc1, data, 4);
-	printf("L_X: %d L_Y: %d R_X: %d, R_Y: %d \n\r", data[0], data[1], data[2], data[3]);
+	//using ADC to read 4 channels joysticks
+	//HAL_ADC_Start_DMA(&hadc1, data, 4);
+	//printf("L_X: %d L_Y: %d R_X: %d, R_Y: %d \n\r", data[0], data[1], data[2], data[3]);
+
+	//checking button from controller
+	if(HAL_GPIO_ReadPin(GPIOC, CON_L_SW_Pin) == GPIO_PIN_RESET)
+	{
+			printf("Wcisnieto L \n\r");
+	}
 
     /* USER CODE END WHILE */
 
@@ -406,10 +414,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ANALOG_L_SW_Pin ANALOG_R_SW_Pin */
-  GPIO_InitStruct.Pin = ANALOG_L_SW_Pin|ANALOG_R_SW_Pin;
+  /*Configure GPIO pins : CON_L_SW_Pin CON_R_SW_Pin */
+  GPIO_InitStruct.Pin = CON_L_SW_Pin|CON_R_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 }
