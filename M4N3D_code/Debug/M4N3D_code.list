@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_ranges 00000d78  00000000  00000000  00034ae0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00029143  00000000  00000000  00035858  2**0
+ 16 .debug_macro  00029173  00000000  00000000  00035858  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000104da  00000000  00000000  0005e99b  2**0
+ 17 .debug_line   000104da  00000000  00000000  0005e9cb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000fec34  00000000  00000000  0006ee75  2**0
+ 18 .debug_str    000fed04  00000000  00000000  0006eea5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0016daa9  2**0
+ 19 .comment      00000050  00000000  00000000  0016dba9  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000043d0  00000000  00000000  0016dafc  2**2
+ 20 .debug_frame  000043d0  00000000  00000000  0016dbfc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -494,7 +494,7 @@ int main(void)
 
 	//checking button from controller
 	if(HAL_GPIO_ReadPin(GPIOC, CON_L_SW_Pin) == GPIO_PIN_RESET)
- 80005ca:	f44f 7180 	mov.w	r1, #256	; 0x100
+ 80005ca:	f44f 7100 	mov.w	r1, #512	; 0x200
  80005ce:	4806      	ldr	r0, [pc, #24]	; (80005e8 <main+0x4c>)
  80005d0:	f002 f962 	bl	8002898 <HAL_GPIO_ReadPin>
  80005d4:	4603      	mov	r3, r0
@@ -1133,7 +1133,7 @@ static void MX_GPIO_Init(void)
  800095a:	f001 ffb5 	bl	80028c8 <HAL_GPIO_WritePin>
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, EFFECTOR_LED_Pin|EFFECTOR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED_CON_ON_Pin|LED_EFFECTOR_Pin, GPIO_PIN_RESET);
  800095e:	2200      	movs	r2, #0
  8000960:	21c0      	movs	r1, #192	; 0xc0
  8000962:	4820      	ldr	r0, [pc, #128]	; (80009e4 <MX_GPIO_Init+0x108>)
@@ -1174,8 +1174,8 @@ static void MX_GPIO_Init(void)
  800099a:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
  800099e:	f001 fdd1 	bl	8002544 <HAL_GPIO_Init>
 
-  /*Configure GPIO pins : EFFECTOR_LED_Pin EFFECTOR_Pin */
-  GPIO_InitStruct.Pin = EFFECTOR_LED_Pin|EFFECTOR_Pin;
+  /*Configure GPIO pins : LED_CON_ON_Pin LED_EFFECTOR_Pin */
+  GPIO_InitStruct.Pin = LED_CON_ON_Pin|LED_EFFECTOR_Pin;
  80009a2:	23c0      	movs	r3, #192	; 0xc0
  80009a4:	617b      	str	r3, [r7, #20]
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -1193,8 +1193,8 @@ static void MX_GPIO_Init(void)
  80009b8:	480a      	ldr	r0, [pc, #40]	; (80009e4 <MX_GPIO_Init+0x108>)
  80009ba:	f001 fdc3 	bl	8002544 <HAL_GPIO_Init>
 
-  /*Configure GPIO pins : CON_L_SW_Pin CON_R_SW_Pin */
-  GPIO_InitStruct.Pin = CON_L_SW_Pin|CON_R_SW_Pin;
+  /*Configure GPIO pins : CON_R_SW_Pin CON_L_SW_Pin */
+  GPIO_InitStruct.Pin = CON_R_SW_Pin|CON_L_SW_Pin;
  80009be:	f44f 7340 	mov.w	r3, #768	; 0x300
  80009c2:	617b      	str	r3, [r7, #20]
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -1396,7 +1396,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PC2     ------> ADC1_IN3
     PC3     ------> ADC1_IN4
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Pin = ADC11_L_X_Pin|ADC12_L_Y_Pin|ADC13_R_X_Pin|ADC14_R_Y_Pin;
  8000adc:	230f      	movs	r3, #15
  8000ade:	f8c7 309c 	str.w	r3, [r7, #156]	; 0x9c
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;

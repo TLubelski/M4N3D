@@ -41,7 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
+ ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 UART_HandleTypeDef huart1;
@@ -392,7 +392,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, EFFECTOR_LED_Pin|EFFECTOR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED_CON_ON_Pin|LED_EFFECTOR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -407,15 +407,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EFFECTOR_LED_Pin EFFECTOR_Pin */
-  GPIO_InitStruct.Pin = EFFECTOR_LED_Pin|EFFECTOR_Pin;
+  /*Configure GPIO pins : LED_CON_ON_Pin LED_EFFECTOR_Pin */
+  GPIO_InitStruct.Pin = LED_CON_ON_Pin|LED_EFFECTOR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CON_L_SW_Pin CON_R_SW_Pin */
-  GPIO_InitStruct.Pin = CON_L_SW_Pin|CON_R_SW_Pin;
+  /*Configure GPIO pins : CON_R_SW_Pin CON_L_SW_Pin */
+  GPIO_InitStruct.Pin = CON_R_SW_Pin|CON_L_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
