@@ -22,7 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "servo.h"
-
+#include "pad.h"
+#include "control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,6 +38,16 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#define TIMEOUT 3000
+#define SPEED 35
+#define L1 44.5
+#define L2 83.2
+#define L3 136.3
+#define L4 31.75
+#define L5 37.6
+#define Q1_OFF 0
+#define Q2_OFF 16
+#define Q3_OFF -5
 
 /* USER CODE END PM */
 
@@ -48,9 +59,6 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
-volatile uint16_t data[2];
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,6 +78,11 @@ int _write(int file, unsigned char *ptr, int len)
 {
 	HAL_UART_Transmit(&huart2, ptr, len, 50);
 	return len;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	SRV_uartIRQ(huart);
 }
 
 /* USER CODE END 0 */
@@ -97,7 +110,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  MX_DMA_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -107,35 +120,27 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
-
+  SRV_Init(&huart1);
+  PAD_Init(&hadc1);
+  RobotParams_Init(L1, L2, L3, L4, L5, deg2rad(Q1_OFF), deg2rad(Q2_OFF), deg2rad(Q3_OFF));
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   HAL_Delay(1000);
+
   printf("System started\r\n");
 
-//  SRV_changeID(1, 3);
-
+  CTRL_startup();
 
   while (1)
   {
-	//test move
-//	SRV_move(3, 0, 200);
-//	HAL_Delay(1000);
-//	SRV_move(3, 50, 200);
-//	HAL_Delay(1000);
+	  PAD_updateState();
+	  CTRL_getRealParams();
 
-	//using ADC to read 4 channels joysticks
-	//HAL_ADC_Start_DMA(&hadc1, data, 4);
-	//printf("L_X: %d L_Y: %d R_X: %d, R_Y: %d \n\r", data[0], data[1], data[2], data[3]);
+	  CTRL_Loop_Manual();
 
-	//checking button from controller
-	if(HAL_GPIO_ReadPin(GPIOC, CON_L_SW_Pin) == GPIO_PIN_RESET)
-	{
-			printf("Wcisnieto L \n\r");
-	}
 
     /* USER CODE END WHILE */
 
@@ -221,13 +226,13 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.NbrOfConversion = 4;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc1.Init.OversamplingMode = DISABLE;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -246,7 +251,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -364,12 +369,12 @@ static void MX_DMA_Init(void)
 {
 
   /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA2_Channel3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Channel3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Channel3_IRQn);
 
 }
 
@@ -392,7 +397,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LED_CON_ON_Pin|LED_EFFECTOR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, EFFECTOR_Pin|LED_MANUAL_Pin|LED_EFFECTOR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -407,15 +412,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED_CON_ON_Pin LED_EFFECTOR_Pin */
-  GPIO_InitStruct.Pin = LED_CON_ON_Pin|LED_EFFECTOR_Pin;
+  /*Configure GPIO pins : EFFECTOR_Pin LED_MANUAL_Pin LED_EFFECTOR_Pin */
+  GPIO_InitStruct.Pin = EFFECTOR_Pin|LED_MANUAL_Pin|LED_EFFECTOR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : CON_R_SW_Pin CON_L_SW_Pin */
-  GPIO_InitStruct.Pin = CON_R_SW_Pin|CON_L_SW_Pin;
+  /*Configure GPIO pins : PAD_R_SW_Pin PAD_L_SW_Pin */
+  GPIO_InitStruct.Pin = PAD_R_SW_Pin|PAD_L_SW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);

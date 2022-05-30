@@ -1,80 +1,176 @@
 #include "servo.h"
+#include "servo_defs.h"
+#include <string.h>
+
+//######################
+//  UART COMMUNICATION
+//######################
+
+#define UART_TIMEOUT 50
+UART_HandleTypeDef* huart_srv;
+
+#define RX_BUFF_SIZE 16
+volatile uint8_t RxBuff[RX_BUFF_SIZE];
+volatile uint8_t* rx_head;
+volatile uint8_t* rx_tail;
 
 
-void _SRV_sendPacket(uint8_t *packet, uint8_t len )
+void SRV_uartClearBuff()
 {
-	HAL_HalfDuplex_EnableTransmitter(&huart1);
-	HAL_UART_Transmit(&huart1, packet , len, 50);
-	HAL_HalfDuplex_EnableReceiver(&huart1);
+	rx_head = RxBuff;
+	rx_tail = RxBuff;
 }
 
-void SRV_setLED(uint8_t id, uint8_t state)
+static inline void SRV_uartStopRx()
 {
-	const uint8_t len = 8;
+	huart_srv->RxState = HAL_UART_STATE_READY;
+}
+
+static inline void SRV_uartStartRx()
+{
+	HAL_UART_Receive_IT(huart_srv, (uint8_t*)rx_head, 1);
+}
+
+void SRV_uartIRQ(UART_HandleTypeDef* huart)
+{
+	if(huart == huart_srv)
+	{
+		rx_head++;
+		if( rx_head == RxBuff+RX_BUFF_SIZE)
+			rx_head = RxBuff;
+		SRV_uartStartRx();
+	}
+}
+
+uint8_t SRV_uartDataAvailable()
+{
+	return rx_head-rx_tail;
+}
+
+uint8_t SRV_uartReadByte()
+{
+	return *(rx_tail++);
+}
+
+uint8_t SRV_uartPeek()
+{
+	return *(rx_tail);
+}
+
+void SRV_uartSendPacket(uint8_t* packet, uint8_t len)
+{
+	SRV_uartStopRx();
+	SRV_uartClearBuff();
+	HAL_HalfDuplex_EnableTransmitter(huart_srv);
+	HAL_UART_Transmit(huart_srv, packet , len, UART_TIMEOUT);
+	HAL_HalfDuplex_EnableReceiver(huart_srv);
+	SRV_uartStartRx();
+}
+
+/* #############################
+ *   SERVO COMMUNICATION LAYER
+ * #############################
+ */
+void SRV_sendCommand(uint8_t id, uint8_t* params)
+{
+	uint8_t base_len = 4;
+	uint8_t params_len = params[0];
+	uint8_t len = base_len + params_len;
+	//preapare packet
 	uint8_t packet[len];
-
-	uint8_t Checksum = (~(id + AX_LED_LENGTH + AX_WRITE_DATA + AX_LED + state)) & 0xFF;
-
 	packet[0] = AX_START;
 	packet[1] = AX_START;
 	packet[2] = id;
-	packet[3] = AX_LED_LENGTH;
-	packet[4] = AX_WRITE_DATA;
-	packet[5] = AX_LED;
-	packet[6] = state;
-	packet[7] = Checksum;
+	memcpy(packet+3, params, params_len);
 
-	_SRV_sendPacket(packet, len);
+	//calculate checksum
+	uint8_t checksum = 0;
+	for( uint8_t i = 2; i < len-1; i++)
+		checksum += packet[i];
+	checksum = ( ~checksum ) & 0xFF;
+	packet[len-1] = checksum;
+
+	//send via uart
+	SRV_uartSendPacket(packet, len);
 }
 
-
-void SRV_changeID(uint8_t id, uint8_t new_id )
+uint8_t SRV_getResponse(uint8_t* response, uint8_t len)
 {
-	const uint8_t len = 8;
-	uint8_t packet[len];
-
-	uint8_t Checksum = (~(id + AX_LED_LENGTH + AX_WRITE_DATA + AX_ID + new_id)) & 0xFF;
-
-	packet[0] = AX_START;
-	packet[1] = AX_START;
-	packet[2] = id;
-	packet[3] = AX_ID_LENGTH;
-	packet[4] = AX_WRITE_DATA;
-	packet[5] = AX_ID;
-	packet[6] = new_id;
-	packet[7] = Checksum;
-
-	_SRV_sendPacket(packet, len);
+	uint32_t start = HAL_GetTick();
+	//wait for data to arrive
+	while( SRV_uartDataAvailable() < len )
+	{
+		if(HAL_GetTick()-start > UART_TIMEOUT) //fail when timed out
+			return 1;
+	}
+	//check for start byte
+	if( SRV_uartPeek() == AX_START )
+	{
+		//copy from rx buff
+		for(uint8_t i = 0; i < len; i++)
+			response[i] = SRV_uartReadByte();
+		return 0;
+	}
+	else return 1;
 }
 
 
-void SRV_move(uint8_t id, int position, int speed)
+
+/* ###############################
+ *   SERVO ABSTRACT COMMANDS
+ * ###############################
+ */
+void SRV_Init(UART_HandleTypeDef* huart)
 {
-    uint8_t Position_H,Position_L,Speed_H,Speed_L;
-    Position_H = position >> 8;           // 16 bits - 2 x 8 bits variables
-    Position_L = position;
-    Speed_H = speed >> 8;
-    Speed_L = speed;                      // 16 bits - 2 x 8 bits variables
-
-
-    const uint8_t length = 11;
-    uint8_t packet[length];
-
-	uint8_t Checksum = (~(id + AX_GOAL_SP_LENGTH + AX_WRITE_DATA + AX_GOAL_POSITION_L + Position_L + Position_H + Speed_L + Speed_H)) & 0xFF;
-
-    packet[0] = AX_START;
-    packet[1] = AX_START;
-    packet[2] = id;
-    packet[3] = AX_GOAL_SP_LENGTH;
-    packet[4] = AX_WRITE_DATA;
-    packet[5] = AX_GOAL_POSITION_L;
-    packet[6] = Position_L;
-    packet[7] = Position_H;
-    packet[8] = Speed_L;
-    packet[9] = Speed_H;
-    packet[10] = Checksum;
-
-    _SRV_sendPacket(packet, length);
+	huart_srv = huart;
+	SRV_uartClearBuff();
 }
+
+uint8_t SRV_readError()
+{
+	uint8_t response[5];
+	SRV_getResponse(response, 5);
+	return response[4];
+}
+
+uint8_t SRV_setLED(uint8_t id, uint8_t state)
+{
+	uint8_t cmd[] = { AX_LED_LENGTH, AX_WRITE_DATA, AX_LED, state};
+	SRV_sendCommand(id, cmd);
+	return SRV_readError();
+}
+
+uint8_t SRV_move(uint8_t id, uint16_t position, uint16_t speed)
+{
+    uint8_t Position_H = position >> 8;           // 16 bits - 2 x 8 bits variables
+    uint8_t Position_L = position;
+    uint8_t Speed_H = speed >> 8;
+    uint8_t Speed_L = speed;                      // 16 bits - 2 x 8 bits variables
+
+	uint8_t cmd[] = {AX_GOAL_SP_LENGTH, AX_WRITE_DATA, AX_GOAL_POSITION_L, Position_L, Position_H, Speed_L, Speed_H };
+	SRV_sendCommand(id, cmd);
+	return SRV_readError();
+}
+
+uint8_t SRV_enableTorque(uint8_t id, uint8_t state)
+{
+	uint8_t cmd[] = { AX_TORQUE_LENGTH, AX_WRITE_DATA, AX_TORQUE_ENABLE, state };
+	SRV_sendCommand(id, cmd);
+	return SRV_readError();
+}
+
+uint16_t SRV_readPosition(uint8_t id)
+{
+	uint8_t cmd[] = {AX_POS_LENGTH, AX_READ_DATA, AX_PRESENT_POSITION_L, AX_BYTE_READ_POS};
+	SRV_sendCommand(id, cmd);
+
+	uint8_t response[8];
+	SRV_getResponse(response,8);
+	return (response[6]<<8) + response[5];
+}
+
+
+
+
 
 

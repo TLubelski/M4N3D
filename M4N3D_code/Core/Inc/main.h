@@ -48,7 +48,15 @@ extern UART_HandleTypeDef huart2;
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+#define max(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a > _b ? _a : _b; })
 
+#define min(a,b) \
+  ({ __typeof__ (a) _a = (a); \
+      __typeof__ (b) _b = (b); \
+    _a < _b ? _a : _b; })
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -75,14 +83,16 @@ void Error_Handler(void);
 #define TTY_UART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
-#define LED_CON_ON_Pin GPIO_PIN_6
-#define LED_CON_ON_GPIO_Port GPIOC
+#define EFFECTOR_Pin GPIO_PIN_4
+#define EFFECTOR_GPIO_Port GPIOC
+#define LED_MANUAL_Pin GPIO_PIN_6
+#define LED_MANUAL_GPIO_Port GPIOC
 #define LED_EFFECTOR_Pin GPIO_PIN_7
 #define LED_EFFECTOR_GPIO_Port GPIOC
-#define CON_R_SW_Pin GPIO_PIN_8
-#define CON_R_SW_GPIO_Port GPIOC
-#define CON_L_SW_Pin GPIO_PIN_9
-#define CON_L_SW_GPIO_Port GPIOC
+#define PAD_R_SW_Pin GPIO_PIN_8
+#define PAD_R_SW_GPIO_Port GPIOC
+#define PAD_L_SW_Pin GPIO_PIN_9
+#define PAD_L_SW_GPIO_Port GPIOC
 #define SRV_UART_RXTX_Pin GPIO_PIN_9
 #define SRV_UART_RXTX_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
