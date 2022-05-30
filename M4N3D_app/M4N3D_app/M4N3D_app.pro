@@ -14,6 +14,7 @@ SOURCES += \
     src/mainwindow.cpp
 
 HEADERS += \
+    inc/communication.hpp \
     inc/mainwindow.hpp
 
 FORMS += \

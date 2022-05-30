@@ -11,6 +11,8 @@
 #include <QObject>
 #include <QTextEdit>
 
+#include "communication.hpp"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -25,23 +27,25 @@ public:
 
     bool exit = 0;
 
+signals:
+    // emited after 'Run' instruction validation
+    // triggers instructions sending event
+    void codePrepared();
+    // emited after reading and validating dataframe from robot
+    // triggers printing values and status in form event
+    void dataArrived();
+
 private:
     Ui::MainWindow *ui;
     QSerialPort *device;
+    QStringList words;
 
-public slots:
-    // call commands function based on textInput
-    void handleConsole();
+    qreal x, y, z, speed;
+    bool is_frame_ok, was_exec_success;
 
 private slots:
-    // adds message to the textEditLog widget
-    void addToLogs(QString message);
-    // receives data from device
-    void readFromDevice();
-    // prints x, y, z, theta in form layout
-    void printData();
-    // updates status in side panel
-    void updateStatus();
+
+    //************************* UI SECTION *************************
     // handles run section
     void handleRun();
     // handles stop section
@@ -52,6 +56,18 @@ private slots:
     void handleConnect();
     // disconnect from the device
     void handleDisconnect();
+
+    //************************ LOGIC SECTION ************************
+    // adds message to the textEditLog widget
+    void addToLogs(QString message);
+    // read data from device
+    void readFromDevice();
+    // prints x, y, z, theta in form layout
+    void updateDataStatus();
+    // execute instructions on robot
+    void execInstructions();
+    // send dataframe to robot
+    int sendDataFrame(int begin);
 
 };
 #endif // MAINWINDOW_HPP

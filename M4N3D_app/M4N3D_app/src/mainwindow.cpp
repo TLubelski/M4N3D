@@ -9,11 +9,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->device = new QSerialPort(this);
 
+    is_frame_ok = was_exec_success = 0;
+    x = y = z = speed = 0;
+
     QObject::connect(ui->pushButtonSearch, SIGNAL(pressed()), this, SLOT(handleSearch()));
     QObject::connect(ui->pushButtonConnect, SIGNAL(pressed()), this, SLOT(handleConnect()));
     QObject::connect(ui->pushButtonDisconnect, SIGNAL(pressed()), this, SLOT(handleDisconnect()));
     QObject::connect(ui->pushButtonRun, SIGNAL(pressed()), this, SLOT(handleRun()));
     QObject::connect(ui->pushButtonStop, SIGNAL(pressed()), this, SLOT(handleStop()));
+    QObject::connect(this, SIGNAL(codePrepared()), this, SLOT(execInstructions()));
+    QObject::connect(this, SIGNAL(dataArrived()), this, SLOT(updateDataStatus()));
 }
 
 MainWindow::~MainWindow()
@@ -97,66 +102,8 @@ void MainWindow::handleDisconnect()
     }
 }
 
-// call commands function based on textInput
-void MainWindow::handleConsole()
-{
-    QString input = ui->console->toPlainText();
-    ui->console->append(input);
-}
-
-// receives data from device
-void MainWindow::readFromDevice()
-{
-    while(this->device->canReadLine())
-    {
-        int init, work, butt;
-        qreal Gy, Gz;
-        bool is_data_ok = false;
-
-        QString line = this->device->readLine();
-
-        // reading control values on fixed positions
-        init = line.at(0).digitValue();
-        work = line.at(2).digitValue();
-        butt = line.at(4).digitValue();
-
-        if(init && work && butt)
-            is_data_ok = true;
-
-        // getting sensor values
-        if(is_data_ok)
-        {
-            // setting number of chars to read
-            //always x.xx = 4 + 1 for sign
-            //(if value is positive it reads " " and cuts it during conversion to float)
-            int char_num = 5;
-            // getting 5 chars from 5th index
-            Gy = line.mid(5, char_num).toFloat();
-            // getting index of next " " after 6th pos
-            int gy_pos = line.indexOf(" ", 6) + 1;
-            // getting 5 chars from next " " char
-            Gz = line.mid(gy_pos, 5).toFloat();
-
-            this->Gy_raw = Gy;
-            this->Gz_raw = Gz;
-            this->analyzeData();
-        }
-        else
-        {
-            qDebug() << "Please press button or check connection lines!";
-        }
-
-    }
-}
-
 // prints x, y, z, theta in form layout
-void MainWindow::printData()
-{
-    qDebug() << "xd";
-}
-
-// updates status inside panel
-void MainWindow::updateStatus()
+void MainWindow::updateDataStatus()
 {
     qDebug() << "xd";
 }
@@ -165,10 +112,16 @@ void MainWindow::updateStatus()
 void MainWindow::handleRun()
 {
     QString input = ui->console->toPlainText();
-    input.replace(" \n", "\n");
-    input.replace("\n ", "\n");
+    input.replace(" \n", " ");
+    input.replace("\n ", " ");
     input.replace("\n", " ");
-    QStringList words = input.split(" ");
+    words = input.split(" ");
+
+    for(auto i = 0; i< words.size(); ++i)
+    {
+        if(words.at(i) == " " || words.at(i) == "\n" || words.at(i) == "")
+            words.removeAt(i);
+    }
 
     int is_code_ok = 0;
     QRegularExpressionMatch match;
@@ -180,8 +133,8 @@ void MainWindow::handleRun()
     {
         if(words.at(i) == "movel")
         {
-            // doing this for next 3 arguments needed
-            for(int num=0; num < 3; ++num)
+            // doing this for next 4 arguments needed
+            for(int num=0; num < 4; ++num)
             {
                 // check if there is next word
                 if(i+1 < words.size())
@@ -206,8 +159,8 @@ void MainWindow::handleRun()
         }
         else if(words.at(i) == "movej")
         {
-            // doing this for next 3 arguments needed
-            for(int num=0; num < 3; ++num)
+            // doing this for next 4 arguments needed
+            for(int num=0; num < 4; ++num)
             {
                 // check if there is next word
                 if(i+1 < words.size())
@@ -308,6 +261,7 @@ void MainWindow::handleRun()
             break;
     }
 
+    if(is_code_ok) emit codePrepared();
 }
 
 // handles stop section
@@ -315,3 +269,107 @@ void MainWindow::handleStop()
 {
     qDebug() << "xd";
 }
+
+void MainWindow::execInstructions()
+{
+    // sending loop
+    for(auto i=0; i < words.size(); ++i)
+    {
+        i += sendDataFrame(i);
+        // wait for answer
+    }
+}
+
+// send dataframe to robot
+int MainWindow::sendDataFrame(int begin)
+{
+    std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
+    int8_t instr, magnet_status,len;
+    int8_t start = 0xFF;
+    int8_t x_H, x_L, y_H, y_L, z_H, z_L, speed_H, speed_L, time_H, time_L;
+
+    if(words.at(begin) == "movel") instr = MOVEL;
+    else if(words.at(begin) == "movej") instr = MOVEJ;
+    else if(words.at(begin) == "wait") instr = WAIT;
+    else /*if(words.at(begin) == "magnet")*/ instr = MAGNET;
+
+    dataframe->push_back(start);
+    dataframe->push_back(start);
+
+    switch(instr)
+    {
+        case 0:
+        case 1:
+            // set all bytes
+            x_H = words.at(begin+1).toInt() >> 8;
+            x_L = words.at(begin+1).toInt();
+            y_H = words.at(begin+2).toInt() >> 8;
+            y_L = words.at(begin+2).toInt();
+            z_H = words.at(begin+3).toInt() >> 8;
+            z_L = words.at(begin+3).toInt();
+            speed_H = words.at(begin+4).toInt() >> 8;
+            speed_L = words.at(begin+4).toInt();
+            len = 9;
+            // add bytes to dataframe
+            dataframe->push_back(len);
+            dataframe->push_back(instr);
+            dataframe->push_back(x_H);
+            dataframe->push_back(x_L);
+            dataframe->push_back(y_H);
+            dataframe->push_back(y_L);
+            dataframe->push_back(z_H);
+            dataframe->push_back(z_L);
+            dataframe->push_back(speed_H);
+            dataframe->push_back(speed_L);
+            break;
+        case 2:
+            // set all bytes
+            time_H = words.at(begin+1).toInt() >> 8;
+            time_L = words.at(begin+1).toInt();
+            len = 3;
+            // add bytes to dataframe
+            dataframe->push_back(len);
+            dataframe->push_back(instr);
+            dataframe->push_back(time_H);
+            dataframe->push_back(time_L);
+            break;
+        case 3:
+            // set all bytes
+            magnet_status = words.at(begin+1).toInt();
+            len = 2;
+            // add bytes to dataframe
+            dataframe->push_back(len);
+            dataframe->push_back(instr);
+            dataframe->push_back(magnet_status);
+            break;
+    }
+
+    //calculating checksum
+    int8_t checksum = 0;
+    for(int i=2; i < len+3; i++)
+        checksum += dataframe->at(i);
+    checksum = (~checksum) & 0xFF;
+    dataframe->push_back(checksum);
+
+    qDebug() << *dataframe;
+    if(instr == 0 || instr == 1)    return 4;
+    else return 1;
+}
+
+// read from device
+void MainWindow::readFromDevice()
+{
+    // FRAME
+    // START START LEN WAS_EXEC_SUCCESS X Y Z SPEED CHECKSUM
+
+    if(is_frame_ok) emit dataArrived();
+}
+
+
+
+
+
+
+
+
+
