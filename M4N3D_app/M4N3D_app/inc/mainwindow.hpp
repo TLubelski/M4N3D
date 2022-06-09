@@ -45,6 +45,7 @@ private:
     bool is_frame_ok;
     MSG msg_type;
     bool got_ack;
+    float x_in, y_in, z_in, j1, j2, j3;
 
 private slots:
 

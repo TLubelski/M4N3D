@@ -268,7 +268,12 @@ void MainWindow::handleStop()
 // prints x, y, z, theta in form layout
 void MainWindow::updateDataStatus()
 {
-    qDebug() << "xd";
+    ui->xValue->setText(QString::number(x_in));
+    ui->yValue->setText(QString::number(y_in));
+    ui->zValue->setText(QString::number(z_in));
+    ui->j1Value->setText(QString::number(j1));
+    ui->j2Value->setText(QString::number(j2));
+    ui->j3Value->setText(QString::number(j3));
 }
 
 //******************************************* LOGIC SECTION *******************************************
@@ -289,7 +294,8 @@ void MainWindow::readFromDevice()
         //std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
         uint8_t checksum = 0;
         uint8_t len;
-        uint8_t x[4], y[4], z[4], j1[4], j2[4], j3[4];
+        floatArray f_pool;
+        std::vector<uint8_t> *error = new std::vector<uint8_t>;
 
         QByteArray line = this->device->readLine();
 
@@ -317,9 +323,24 @@ void MainWindow::readFromDevice()
                         emit stateUpdate(DONE);
                         break;
                     case DATA:
+                        memcpy(f_pool.bytes, line+4, 4);
+                        x_in = f_pool.var;
+                        memcpy(f_pool.bytes, line+8, 4);
+                        y_in = f_pool.var;
+                        memcpy(f_pool.bytes, line+12, 4);
+                        x_in = f_pool.var;
+                        memcpy(f_pool.bytes, line+16, 4);
+                        j1 = f_pool.var;
+                        memcpy(f_pool.bytes, line+20, 4);
+                        j2 = f_pool.var;
+                        memcpy(f_pool.bytes, line+24, 4);
+                        j3 = f_pool.var;
                         emit dataArrived();
                         break;
                     case DEBUG:
+                        for(auto i=0; i < len; i++)
+                            error->push_back(line.at(i));
+                        ui->textEditLogs->append((char*)error);
                         break;
                     default:
                         ui->textEditLogs->append("Not possible, but readFromDevice fucked up :(");
@@ -375,21 +396,6 @@ void MainWindow::execInstructions(MSG msg)
         case DEBUG:
             break;
     }
-
-
-
-    // sending event
-
-    // receiving event
-
-
-
-    // sending loop
-    for(auto i=0; i < words.size(); ++i)
-    {
-        i += sendDataFrame(i);
-        // wait for answer
-    }
 }
 
 // send dataframe to robot
@@ -398,6 +404,8 @@ void MainWindow::execInstructions(MSG msg)
 // begin is index of instruction name
 int MainWindow::sendDataFrame(MSG msg, int begin)
 {
+    //DATA FRAME
+    // START START LEN INSTR {PARAMS} CHECKSUM ENDL
     std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
     uint8_t instr, magnet_status, len;
     uint8_t start = 0xFF;
@@ -480,6 +488,7 @@ int MainWindow::sendDataFrame(MSG msg, int begin)
         checksum += dataframe->at(i);
     checksum = (~checksum) & 0xFF;
     dataframe->push_back(checksum);
+    dataframe->push_back('\n');
 
     // sending dataframe over UART
     if(return_val >= 0 && got_ack)

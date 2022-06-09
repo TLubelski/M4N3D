@@ -18,4 +18,9 @@ typedef enum
     DEBUG = 14
 } MSG;
 
+typedef union {
+    float var;
+    uint8_t bytes[4];
+} floatArray;
+
 #endif // COMMUNICATION_HPP
