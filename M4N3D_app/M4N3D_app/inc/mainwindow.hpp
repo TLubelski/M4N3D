@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QObject>
 #include <QTextEdit>
+#include <QByteArray>
 
 #include "communication.hpp"
 
@@ -30,7 +31,7 @@ public:
 signals:
     // emited after 'Run' instruction validation
     // triggers instructions sending event
-    void codePrepared();
+    void stateUpdate(MSG msgs);
     // emited after reading and validating dataframe from robot
     // triggers printing values and status in form event
     void dataArrived();
@@ -41,33 +42,35 @@ private:
     QStringList words;
 
     qreal x, y, z, speed;
-    bool is_frame_ok, was_exec_success;
+    bool is_frame_ok;
+    MSG msg_type;
+    bool got_ack;
 
 private slots:
 
     //************************* UI SECTION *************************
-    // handles run section
-    void handleRun();
-    // handles stop section
-    void handleStop();
     // search avalaible devices
     void handleSearch();
     // connect to the chosen device
     void handleConnect();
     // disconnect from the device
     void handleDisconnect();
+    // handles run section
+    void handleRun();
+    // handles stop section
+    void handleStop();
+    // prints x, y, z, theta in form layout
+    void updateDataStatus();
 
     //************************ LOGIC SECTION ************************
     // adds message to the textEditLog widget
     void addToLogs(QString message);
     // read data from device
     void readFromDevice();
-    // prints x, y, z, theta in form layout
-    void updateDataStatus();
     // execute instructions on robot
-    void execInstructions();
+    void execInstructions(MSG msg);
     // send dataframe to robot
-    int sendDataFrame(int begin);
+    int sendDataFrame(MSG msg, int begin);
 
 };
 #endif // MAINWINDOW_HPP

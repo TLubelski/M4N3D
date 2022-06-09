@@ -3,12 +3,19 @@
 
 #include <cstdint>
 
-enum INSTR
+typedef enum
 {
-    MOVEL = 0,
-    MOVEJ = 1,
-    WAIT = 2,
-    MAGNET = 3
-};
+    START = 1,
+    STOP = 2,
+    MOVEL = 3,
+    MOVEJ = 4,
+    WAIT = 5,
+    MAGNET = 6,
+
+    ACK = 11,
+    DONE = 12,
+    DATA = 13,
+    DEBUG = 14
+} MSG;
 
 #endif // COMMUNICATION_HPP

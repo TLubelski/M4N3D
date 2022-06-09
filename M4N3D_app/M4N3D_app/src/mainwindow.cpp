@@ -9,16 +9,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->device = new QSerialPort(this);
 
-    is_frame_ok = was_exec_success = 0;
+    is_frame_ok = 0;
     x = y = z = speed = 0;
+    got_ack = false;
 
+    // connection stuff
     QObject::connect(ui->pushButtonSearch, SIGNAL(pressed()), this, SLOT(handleSearch()));
     QObject::connect(ui->pushButtonConnect, SIGNAL(pressed()), this, SLOT(handleConnect()));
     QObject::connect(ui->pushButtonDisconnect, SIGNAL(pressed()), this, SLOT(handleDisconnect()));
+    // emit for run
     QObject::connect(ui->pushButtonRun, SIGNAL(pressed()), this, SLOT(handleRun()));
+    // emit for stop
     QObject::connect(ui->pushButtonStop, SIGNAL(pressed()), this, SLOT(handleStop()));
-    QObject::connect(this, SIGNAL(codePrepared()), this, SLOT(execInstructions()));
+    // emit for connectivity stuff
+    QObject::connect(this, SIGNAL(stateUpdate()), this, SLOT(execInstructions()));
+    // emit for printing data
     QObject::connect(this, SIGNAL(dataArrived()), this, SLOT(updateDataStatus()));
+    // emited when data arrived
+    QObject::connect(this->device, SIGNAL(readyRead()), this, SLOT(readFromDevice()));
 }
 
 MainWindow::~MainWindow()
@@ -26,12 +34,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// adds message to the textEditLog widget
-void MainWindow::addToLogs(QString message)
-{
-    QString currDateTime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
-    ui->textEditLogs->append(currDateTime + "\t" + message);
-}
+//******************************************* UI SECTION *******************************************
 
 // search avalaible devices
 void MainWindow::handleSearch()
@@ -102,12 +105,6 @@ void MainWindow::handleDisconnect()
     }
 }
 
-// prints x, y, z, theta in form layout
-void MainWindow::updateDataStatus()
-{
-    qDebug() << "xd";
-}
-
 // handles run section
 void MainWindow::handleRun()
 {
@@ -125,6 +122,7 @@ void MainWindow::handleRun()
 
     int is_code_ok = 0;
     QRegularExpressionMatch match;
+    QRegularExpression regex("\\d+");
 
     ui->textEditLogs->clear();
     ui->textEditLogs->append("Running...");
@@ -139,7 +137,6 @@ void MainWindow::handleRun()
                 // check if there is next word
                 if(i+1 < words.size())
                 {
-                    QRegularExpression regex("\\d+");
                     match = regex.match(words.at(i+1));
                     // check if word.at(i+1) is a number
                     if(match.hasMatch())
@@ -165,7 +162,6 @@ void MainWindow::handleRun()
                 // check if there is next word
                 if(i+1 < words.size())
                 {
-                    QRegularExpression regex("\\d+");
                     match = regex.match(words.at(i+1));
                     // check if word.at(i+1) is a number
                     if(match.hasMatch())
@@ -189,7 +185,6 @@ void MainWindow::handleRun()
             // check if there is anything after 'wait' command
             if(i+1 < words.size())
             {
-                QRegularExpression regex("\\d+");
                 match = regex.match(words.at(i+1));
                 // check if 'wait' command is ok
                 if(match.hasMatch())
@@ -261,17 +256,134 @@ void MainWindow::handleRun()
             break;
     }
 
-    if(is_code_ok) emit codePrepared();
+    if(is_code_ok == 1) emit stateUpdate(START);
 }
 
 // handles stop section
 void MainWindow::handleStop()
 {
+    emit stateUpdate(STOP);
+}
+
+// prints x, y, z, theta in form layout
+void MainWindow::updateDataStatus()
+{
     qDebug() << "xd";
 }
 
-void MainWindow::execInstructions()
+//******************************************* LOGIC SECTION *******************************************
+
+// adds message to the textEditLog widget
+void MainWindow::addToLogs(QString message)
 {
+    QString currDateTime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
+    ui->textEditLogs->append(currDateTime + "\t" + message);
+}
+
+// read from device
+void MainWindow::readFromDevice()
+{
+    if(this->device->canReadLine())
+    {
+        //read it
+        //std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
+        uint8_t checksum = 0;
+        uint8_t len;
+        uint8_t x[4], y[4], z[4], j1[4], j2[4], j3[4];
+
+        QByteArray line = this->device->readLine();
+
+        // check if start bytes are ok
+        if(line.at(0) == (char)0xFF && line.at(1) == (char)0xFF)
+        {
+            // check if checksum is ok
+            len = (uint8_t)line.at(2);
+            for(int i=2; i < len+3; i++)
+                checksum += (uint8_t)line.at(i);
+            checksum = (~checksum) & 0xFF;
+
+            // if checksum is ok get the data
+            if(checksum == (uint8_t)line.at(len + 3))
+            {
+                // getting data from line
+                msg_type = (MSG)line.at(3);
+
+                switch(msg_type)
+                {
+                    case ACK:
+                        emit stateUpdate(ACK);
+                        break;
+                    case DONE:
+                        emit stateUpdate(DONE);
+                        break;
+                    case DATA:
+                        emit dataArrived();
+                        break;
+                    case DEBUG:
+                        break;
+                    default:
+                        ui->textEditLogs->append("Not possible, but readFromDevice fucked up :(");
+                    break;
+
+                }
+
+
+                is_frame_ok = true;
+            }
+            else
+            {
+                is_frame_ok = false;
+                ui->textEditLogs->append("Checksum doesn't match.");
+            }
+        }
+        else
+        {
+            is_frame_ok = false;
+            ui->textEditLogs->append("Start bytes have wrong values.");
+        }
+    }        
+}
+
+void MainWindow::execInstructions(MSG msg)
+{
+    int curr_index_of_words = 0;
+
+    switch(msg)
+    {
+        case START:
+            sendDataFrame(START, -1);
+            break;
+        case STOP:
+            sendDataFrame(STOP, -1);
+            break;
+        case ACK:
+            got_ack = true;
+            break;
+        case DONE:
+            if(curr_index_of_words < words.size())
+            {
+                if(words.at(curr_index_of_words) == "movel")
+                    curr_index_of_words += sendDataFrame(MOVEL, curr_index_of_words);
+                else if(words.at(curr_index_of_words) == "movej")
+                    curr_index_of_words += sendDataFrame(MOVEJ, curr_index_of_words);
+                else if(words.at(curr_index_of_words) == "wait")
+                    curr_index_of_words += sendDataFrame(WAIT, curr_index_of_words);
+                else if(words.at(curr_index_of_words) == "magnet")
+                    curr_index_of_words += sendDataFrame(MAGNET, curr_index_of_words);
+            }
+            break;
+        case DEBUG:
+            break;
+    }
+
+
+
+    // sending event
+
+    // receiving event
+
+
+
     // sending loop
     for(auto i=0; i < words.size(); ++i)
     {
@@ -281,25 +393,36 @@ void MainWindow::execInstructions()
 }
 
 // send dataframe to robot
-int MainWindow::sendDataFrame(int begin)
+// this method uses 'words' string, which may contains multiple instructions
+// that is why begin is given, it's the index, where sending starts
+// begin is index of instruction name
+int MainWindow::sendDataFrame(MSG msg, int begin)
 {
     std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
-    int8_t instr, magnet_status,len;
-    int8_t start = 0xFF;
-    int8_t x_H, x_L, y_H, y_L, z_H, z_L, speed_H, speed_L, time_H, time_L;
-
-    if(words.at(begin) == "movel") instr = MOVEL;
-    else if(words.at(begin) == "movej") instr = MOVEJ;
-    else if(words.at(begin) == "wait") instr = WAIT;
-    else /*if(words.at(begin) == "magnet")*/ instr = MAGNET;
+    uint8_t instr, magnet_status, len;
+    uint8_t start = 0xFF;
+    uint8_t x_H, x_L, y_H, y_L, z_H, z_L, speed_H, speed_L, time_H, time_L;
+    int return_val;
 
     dataframe->push_back(start);
     dataframe->push_back(start);
 
-    switch(instr)
+    switch(msg)
     {
-        case 0:
-        case 1:
+        case START:
+            len = 1;
+            dataframe->push_back(len);
+            dataframe->push_back(instr);
+            return_val = 0;
+            break;
+        case STOP:
+            len = 1;
+            dataframe->push_back(len);
+            dataframe->push_back(instr);
+            return_val = 0;
+            break;
+        case MOVEL:
+        case MOVEJ:
             // set all bytes
             x_H = words.at(begin+1).toInt() >> 8;
             x_L = words.at(begin+1).toInt();
@@ -321,8 +444,9 @@ int MainWindow::sendDataFrame(int begin)
             dataframe->push_back(z_L);
             dataframe->push_back(speed_H);
             dataframe->push_back(speed_L);
+            return_val = 4;
             break;
-        case 2:
+        case WAIT:
             // set all bytes
             time_H = words.at(begin+1).toInt() >> 8;
             time_L = words.at(begin+1).toInt();
@@ -332,8 +456,9 @@ int MainWindow::sendDataFrame(int begin)
             dataframe->push_back(instr);
             dataframe->push_back(time_H);
             dataframe->push_back(time_L);
+            return_val = 1;
             break;
-        case 3:
+        case MAGNET:
             // set all bytes
             magnet_status = words.at(begin+1).toInt();
             len = 2;
@@ -341,28 +466,33 @@ int MainWindow::sendDataFrame(int begin)
             dataframe->push_back(len);
             dataframe->push_back(instr);
             dataframe->push_back(magnet_status);
+            return_val = 1;
+            break;
+        default:
+            ui->textEditLogs->append("Not possible, but sendDataFrame fucked up :(");
+            return_val = -1;
             break;
     }
 
     //calculating checksum
-    int8_t checksum = 0;
+    uint8_t checksum = 0;
     for(int i=2; i < len+3; i++)
         checksum += dataframe->at(i);
     checksum = (~checksum) & 0xFF;
     dataframe->push_back(checksum);
 
+    // sending dataframe over UART
+    if(return_val >= 0 && got_ack)
+    {
+        got_ack = false;
+        this->device->write((char*)dataframe);
+    }
+    else
+        ui->textEditLogs->append("Didn't send dataframe, bc You fucked up :(");
+
     qDebug() << *dataframe;
-    if(instr == 0 || instr == 1)    return 4;
-    else return 1;
-}
 
-// read from device
-void MainWindow::readFromDevice()
-{
-    // FRAME
-    // START START LEN WAS_EXEC_SUCCESS X Y Z SPEED CHECKSUM
-
-    if(is_frame_ok) emit dataArrived();
+    return return_val;
 }
 
 
