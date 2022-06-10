@@ -22,11 +22,15 @@ MainWindow::MainWindow(QWidget *parent)
     // emit for stop
     QObject::connect(ui->pushButtonStop, SIGNAL(pressed()), this, SLOT(handleStop()));
     // emit for connectivity stuff
-    QObject::connect(this, SIGNAL(stateUpdate()), this, SLOT(execInstructions()));
+    QObject::connect(this, SIGNAL(stateUpdate(MSG)), this, SLOT(execInstructions(MSG)));
     // emit for printing data
     QObject::connect(this, SIGNAL(dataArrived()), this, SLOT(updateDataStatus()));
     // emited when data arrived
     QObject::connect(this->device, SIGNAL(readyRead()), this, SLOT(readFromDevice()));
+    //logs
+    QObject::connect(ui->pushButtonLogsClear, SIGNAL(pressed()), ui->textEditLogs, SLOT(clear()));
+    QObject::connect(ui->pushButtonPacketsClear, SIGNAL(pressed()), ui->textEditPacket, SLOT(clear()));
+    handleSearch();
 }
 
 MainWindow::~MainWindow()
@@ -40,7 +44,7 @@ MainWindow::~MainWindow()
 void MainWindow::handleSearch()
 {
     ui->comboBoxDevices->clear();
-    this->addToLogs("Szukam urządzeń...");
+    this->addToLogs("Scanning...");
 
     QList<QSerialPortInfo> devices;
     devices = QSerialPortInfo::availablePorts();
@@ -48,8 +52,11 @@ void MainWindow::handleSearch()
     {
         for(int i=0; i<devices.count(); i++)
         {
-            this->addToLogs(devices.at(i).portName() + " " + devices.at(i).description());
-            ui->comboBoxDevices->addItem(devices.at(i).portName());
+            if(devices.at(i).portName() != "ttyS0")
+            {
+                this->addToLogs("Found " + devices.at(i).portName() + " " + devices.at(i).description());
+                ui->comboBoxDevices->addItem(devices.at(i).portName());
+            }
         }
     }
 }
@@ -59,12 +66,12 @@ void MainWindow::handleConnect()
 {
     if(ui->comboBoxDevices->count() == 0)
     {
-        this->addToLogs("Nie wykryto żadnych urządzeń!");
+        this->addToLogs("Not found any device!");
         return;
     }
     if(this->device->isOpen())
     {
-        this->addToLogs("Port jest już otwarty!");
+        this->addToLogs("Port already open!");
         return;
     }
 
@@ -80,12 +87,12 @@ void MainWindow::handleConnect()
         this->device->setStopBits(QSerialPort::OneStop);
         this->device->setFlowControl(QSerialPort::NoFlowControl);
 
-        this->addToLogs("Połączono z urządzeniem " + portName);
+        this->addToLogs("Connected to " + portName);
         connect(this->device, SIGNAL(readyRead()), this, SLOT(readFromDevice()));
     }
     else
     {
-        this->addToLogs("Otwarcie portu szeregowego się nie powiodło!");
+        this->addToLogs("Opening serial port failed!");
         this->addToLogs(device->errorString());
         qDebug() << this->device->error();
     }
@@ -97,17 +104,20 @@ void MainWindow::handleDisconnect()
     if(this->device->isOpen())
     {
       this->device->close();
-      this->addToLogs("Zamknięto połączenie.");
+      this->addToLogs("Connection closed.");
     }
     else
     {
-      this->addToLogs("Port nie jest otwarty!");
+      this->addToLogs("Port is not open");
     }
+
 }
 
 // handles run section
 void MainWindow::handleRun()
 {
+    curr_index_of_words = 0;
+    ui->textEditPacket->clear();
     QString input = ui->console->toPlainText();
     input.replace(" \n", " ");
     input.replace("\n ", " ");
@@ -132,7 +142,7 @@ void MainWindow::handleRun()
         if(words.at(i) == "movel")
         {
             // doing this for next 4 arguments needed
-            for(int num=0; num < 4; ++num)
+            for(int num=0; num < 3; ++num)
             {
                 // check if there is next word
                 if(i+1 < words.size())
@@ -157,7 +167,7 @@ void MainWindow::handleRun()
         else if(words.at(i) == "movej")
         {
             // doing this for next 4 arguments needed
-            for(int num=0; num < 4; ++num)
+            for(int num=0; num < 3; ++num)
             {
                 // check if there is next word
                 if(i+1 < words.size())
@@ -256,8 +266,73 @@ void MainWindow::handleRun()
             break;
     }
 
-    if(is_code_ok == 1) emit stateUpdate(START);
+//    for( auto &elem: words)
+//      qDebug() << elem;
+
+     parseCommand();
+
+
+
+    if(is_code_ok == 1)
+    {
+        emit stateUpdate(START);
+    }
 }
+
+void MainWindow::parseCommand()
+{
+  float t1, t2, t3;
+  int i = 0;
+  while(!cmd_queue.empty())cmd_queue.pop();
+  cmd_queue.push(std::make_shared<CmdStart>(i));
+  i++;
+  auto iter = words.begin();
+  while(iter != words.end())
+  {
+    if( *iter == "magnet" )
+    {
+      iter++;
+      cmd_queue.push( std::make_shared<CmdMagnet>(i, iter->toInt()) );
+      iter++;
+    }
+    else if( *iter == "wait")
+    {
+      iter++;
+      cmd_queue.push( std::make_shared<CmdWait>(i, iter->toInt()) );
+      iter++;
+    }
+    else if(*iter == "movej")
+    {
+      iter++;
+      t1 = iter->toFloat();
+      iter++;
+      t2 = iter->toFloat();
+      iter++;
+      t3 = iter->toFloat();
+      iter++;
+      cmd_queue.push( std::make_shared<CmdMoveJ>(i, t1,t2,t3) );
+    }
+    else if( *iter == "movel")
+    {
+      iter++;
+      t1 = iter->toFloat();
+      iter++;
+      t2 = iter->toFloat();
+      iter++;
+      t3 = iter->toFloat();
+      iter++;
+      cmd_queue.push( std::make_shared<CmdMoveL>(i, t1,t2,t3) );
+    }
+    i++;
+  }
+
+  cmd_queue.push(std::make_shared<CmdStop>(i));
+
+  qDebug() << "SIZE: " << cmd_queue.size();
+
+}
+
+
 
 // handles stop section
 void MainWindow::handleStop()
@@ -279,10 +354,14 @@ void MainWindow::updateDataStatus()
 //******************************************* LOGIC SECTION *******************************************
 
 // adds message to the textEditLog widget
-void MainWindow::addToLogs(QString message)
+void MainWindow::addToLogs(QString message, bool error)
 {
-    QString currDateTime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
-    ui->textEditLogs->append(currDateTime + "\t" + message);
+  if( error && !ui->checkBoxDebug->isChecked())
+    return;
+
+  QString currDateTime = QDateTime::currentDateTime().toString("hh:mm:ss");
+  QString type = (error) ? "ERROR: " : "";
+  ui->textEditLogs->append(currDateTime + " | " + type + message);
 }
 
 // read from device
@@ -290,107 +369,140 @@ void MainWindow::readFromDevice()
 {
     if(this->device->canReadLine())
     {
-        //read it
-        //std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
         uint8_t checksum = 0;
         uint8_t len;
-        floatArray f_pool;
-        std::vector<uint8_t> *error = new std::vector<uint8_t>;
+        QByteArray line = this->device->readAll();
 
-        QByteArray line = this->device->readLine();
-
-        // check if start bytes are ok
-        if(line.at(0) == (char)0xFF && line.at(1) == (char)0xFF)
+        if( frame_buffer.length() == 0)
         {
-            // check if checksum is ok
-            len = (uint8_t)line.at(2);
-            for(int i=2; i < len+3; i++)
-                checksum += (uint8_t)line.at(i);
-            checksum = (~checksum) & 0xFF;
+          is_frame_full = false;
 
-            // if checksum is ok get the data
-            if(checksum == (uint8_t)line.at(len + 3))
-            {
-                // getting data from line
-                msg_type = (MSG)line.at(3);
-
-                switch(msg_type)
-                {
-                    case ACK:
-                        emit stateUpdate(ACK);
-                        break;
-                    case DONE:
-                        emit stateUpdate(DONE);
-                        break;
-                    case DATA:
-                        memcpy(f_pool.bytes, line+4, 4);
-                        x_in = f_pool.var;
-                        memcpy(f_pool.bytes, line+8, 4);
-                        y_in = f_pool.var;
-                        memcpy(f_pool.bytes, line+12, 4);
-                        x_in = f_pool.var;
-                        memcpy(f_pool.bytes, line+16, 4);
-                        j1 = f_pool.var;
-                        memcpy(f_pool.bytes, line+20, 4);
-                        j2 = f_pool.var;
-                        memcpy(f_pool.bytes, line+24, 4);
-                        j3 = f_pool.var;
-                        emit dataArrived();
-                        break;
-                    case DEBUG:
-                        for(auto i=0; i < len; i++)
-                            error->push_back(line.at(i));
-                        ui->textEditLogs->append((char*)error);
-                        break;
-                    default:
-                        ui->textEditLogs->append("Not possible, but readFromDevice fucked up :(");
-                    break;
-
-                }
-
-
-                is_frame_ok = true;
-            }
-            else
-            {
-                is_frame_ok = false;
-                ui->textEditLogs->append("Checksum doesn't match.");
-            }
+          if(line.at(0) == (char)0xFF && line.at(1) == (char)0xFF)
+          {
+            frame_buffer.append(line);
+            len = frame_buffer.at(2);
+            if( len+5 == frame_buffer.length())
+              is_frame_full = true;
+          }
+          else
+          {
+              addToLogs("Start bytes have wrong values.", 1);
+              frame_buffer.clear();
+          }
         }
         else
         {
-            is_frame_ok = false;
-            ui->textEditLogs->append("Start bytes have wrong values.");
+            frame_buffer.append(line);
+            len = frame_buffer.at(2);
+            if( len+5 == frame_buffer.length())
+              is_frame_full = true;
+            else
+            {
+              frame_buffer.clear();
+              addToLogs("Packet malformed", 1);
+              is_frame_full = false;
+            }
         }
+
+        // check checksum
+        if(is_frame_full)
+        {
+            //qDebug() << frame_buffer.toHex();
+            len = (uint8_t)frame_buffer.at(2);
+            for(int i=2; i < len+3; i++)
+                checksum += (uint8_t)frame_buffer.at(i);
+            checksum = (~checksum) & 0xFF;
+
+            // if checksum is ok get the data
+            if(checksum == (uint8_t)frame_buffer.at(len + 3))
+              is_frame_ok = true;
+            else
+            {
+                frame_buffer.clear();
+                is_frame_ok = false;
+                is_frame_full = false;
+                addToLogs("Checksum doesn't match.", 1);
+            }
+        }
+
+        // parse buffer
+        if(is_frame_ok)
+        {
+            qDebug() << "<< 0x" + frame_buffer.toHex();
+            if( frame_buffer.at(3) == ACK || frame_buffer.at(3) == DONE )
+              ui->textEditPacket->append("<span style=' font-weight:700; color:#f0bc13;'>&lt;&lt;</span> 0x" + frame_buffer.toHex() + "   " + ((frame_buffer.at(3) == ACK) ? "ACK" : "DONE"));
+            is_frame_full = false;
+            is_frame_ok = false;
+            parseFrameBuffer();
+            frame_buffer.clear();
+        }
+
     }        
 }
 
+void MainWindow::parseFrameBuffer()
+{
+
+  // getting data from line
+  floatArray f_pool;
+  msg_type = (MSG)frame_buffer.at(3);
+  int len = frame_buffer.at(2);
+  std::vector<uint8_t> *error = new std::vector<uint8_t>;
+
+  switch(msg_type)
+  {
+      case ACK:
+          emit stateUpdate(ACK);
+          break;
+      case DONE:
+          emit stateUpdate(DONE);
+          break;
+      case DATA:
+          memcpy(f_pool.bytes, frame_buffer.constData()+4, 4);
+          x_in = f_pool.var;
+          memcpy(f_pool.bytes, frame_buffer.constData()+8, 4);
+          y_in = f_pool.var;
+          memcpy(f_pool.bytes, frame_buffer.constData()+12, 4);
+          z_in = f_pool.var;
+          memcpy(f_pool.bytes, frame_buffer.constData()+16, 4);
+          j1 = f_pool.var;
+          memcpy(f_pool.bytes, frame_buffer.constData()+20, 4);
+          j2 = f_pool.var;
+          memcpy(f_pool.bytes, frame_buffer.constData()+24, 4);
+          j3 = f_pool.var;
+          emit dataArrived();
+          break;
+      case DEBUG:
+          for(int i=0; i < len; i++)
+              error->push_back(frame_buffer.at(i+3));
+          ui->textEditLogs->append((char*)error);
+          break;
+      default:
+          ui->textEditLogs->append("Not possible, but readFromDevice fucked up :(");
+      break;
+  }
+  delete error;
+}
+
+
+
 void MainWindow::execInstructions(MSG msg)
 {
-    int curr_index_of_words = 0;
-
     switch(msg)
     {
-        case START:
-            sendDataFrame(START, -1);
-            break;
         case STOP:
-            sendDataFrame(STOP, -1);
+            while(!cmd_queue.empty()) cmd_queue.pop();
+            sendPacket(CmdStop(-1).getPacket());
             break;
         case ACK:
             got_ack = true;
             break;
+        case START:
         case DONE:
-            if(curr_index_of_words < words.size())
+            if( !cmd_queue.empty() )
             {
-                if(words.at(curr_index_of_words) == "movel")
-                    curr_index_of_words += sendDataFrame(MOVEL, curr_index_of_words);
-                else if(words.at(curr_index_of_words) == "movej")
-                    curr_index_of_words += sendDataFrame(MOVEJ, curr_index_of_words);
-                else if(words.at(curr_index_of_words) == "wait")
-                    curr_index_of_words += sendDataFrame(WAIT, curr_index_of_words);
-                else if(words.at(curr_index_of_words) == "magnet")
-                    curr_index_of_words += sendDataFrame(MAGNET, curr_index_of_words);
+                sendPacket( cmd_queue.front()->getPacket() );
+                cmd_queue.pop();
             }
             break;
         case DEBUG:
@@ -398,116 +510,27 @@ void MainWindow::execInstructions(MSG msg)
     }
 }
 
-// send dataframe to robot
-// this method uses 'words' string, which may contains multiple instructions
-// that is why begin is given, it's the index, where sending starts
-// begin is index of instruction name
-int MainWindow::sendDataFrame(MSG msg, int begin)
+
+void MainWindow::sendPacket(QByteArray data)
 {
-    //DATA FRAME
-    // START START LEN INSTR {PARAMS} CHECKSUM ENDL
-    std::vector<uint8_t> *dataframe = new std::vector<uint8_t>;
-    uint8_t instr, magnet_status, len;
-    uint8_t start = 0xFF;
-    uint8_t x_H, x_L, y_H, y_L, z_H, z_L, speed_H, speed_L, time_H, time_L;
-    int return_val;
+  QByteArray packet;
+  packet.append(0xFF);
+  packet.append(0xFF);
+  packet.append(data);
 
-    dataframe->push_back(start);
-    dataframe->push_back(start);
+  uint8_t checksum = 0;
+  for(auto &elem : data)
+      checksum += elem;
+  checksum = (~checksum) & 0xFF;
 
-    switch(msg)
-    {
-        case START:
-            len = 1;
-            dataframe->push_back(len);
-            dataframe->push_back(instr);
-            return_val = 0;
-            break;
-        case STOP:
-            len = 1;
-            dataframe->push_back(len);
-            dataframe->push_back(instr);
-            return_val = 0;
-            break;
-        case MOVEL:
-        case MOVEJ:
-            // set all bytes
-            x_H = words.at(begin+1).toInt() >> 8;
-            x_L = words.at(begin+1).toInt();
-            y_H = words.at(begin+2).toInt() >> 8;
-            y_L = words.at(begin+2).toInt();
-            z_H = words.at(begin+3).toInt() >> 8;
-            z_L = words.at(begin+3).toInt();
-            speed_H = words.at(begin+4).toInt() >> 8;
-            speed_L = words.at(begin+4).toInt();
-            len = 9;
-            // add bytes to dataframe
-            dataframe->push_back(len);
-            dataframe->push_back(instr);
-            dataframe->push_back(x_H);
-            dataframe->push_back(x_L);
-            dataframe->push_back(y_H);
-            dataframe->push_back(y_L);
-            dataframe->push_back(z_H);
-            dataframe->push_back(z_L);
-            dataframe->push_back(speed_H);
-            dataframe->push_back(speed_L);
-            return_val = 4;
-            break;
-        case WAIT:
-            // set all bytes
-            time_H = words.at(begin+1).toInt() >> 8;
-            time_L = words.at(begin+1).toInt();
-            len = 3;
-            // add bytes to dataframe
-            dataframe->push_back(len);
-            dataframe->push_back(instr);
-            dataframe->push_back(time_H);
-            dataframe->push_back(time_L);
-            return_val = 1;
-            break;
-        case MAGNET:
-            // set all bytes
-            magnet_status = words.at(begin+1).toInt();
-            len = 2;
-            // add bytes to dataframe
-            dataframe->push_back(len);
-            dataframe->push_back(instr);
-            dataframe->push_back(magnet_status);
-            return_val = 1;
-            break;
-        default:
-            ui->textEditLogs->append("Not possible, but sendDataFrame fucked up :(");
-            return_val = -1;
-            break;
-    }
+  packet.append(checksum);
+  packet.append('\n');
 
-    //calculating checksum
-    uint8_t checksum = 0;
-    for(int i=2; i < len+3; i++)
-        checksum += dataframe->at(i);
-    checksum = (~checksum) & 0xFF;
-    dataframe->push_back(checksum);
-    dataframe->push_back('\n');
+  this->device->write(packet);
 
-    // sending dataframe over UART
-    if(return_val >= 0 && got_ack)
-    {
-        got_ack = false;
-        this->device->write((char*)dataframe);
-    }
-    else
-        ui->textEditLogs->append("Didn't send dataframe, bc You fucked up :(");
-
-    qDebug() << *dataframe;
-
-    return return_val;
+  qDebug() << ">> 0x" + packet.toHex();
+  ui->textEditPacket->append("<span style=' font-weight:700; color:#62a0ea;'>&gt;&gt;</span> 0x" + packet.toHex());
 }
-
-
-
-
-
 
 
 

@@ -3,6 +3,13 @@
 
 #include <cstdint>
 
+#define LEN_START 1
+#define LEN_STOP 1
+#define LEN_MAGNET 2
+#define LEN_MOVEJ 13
+#define LEN_MOVEL 13
+#define LEN_WAIT 5
+
 typedef enum
 {
     START = 1,
@@ -22,5 +29,10 @@ typedef union {
     float var;
     uint8_t bytes[4];
 } floatArray;
+
+typedef union {
+    uint32_t var;
+    uint8_t bytes[4];
+} u32Array;
 
 #endif // COMMUNICATION_HPP

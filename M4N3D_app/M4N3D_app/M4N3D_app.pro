@@ -14,11 +14,14 @@ SOURCES += \
     src/mainwindow.cpp
 
 HEADERS += \
+    inc/command.hpp \
     inc/communication.hpp \
     inc/mainwindow.hpp
 
 FORMS += \
     ui/mainwindow.ui
+
+RESOURCES += style/breeze.qrc
 
 TRANSLATIONS += \
     M4N3D_app_en_150.ts
