@@ -39,6 +39,12 @@ public:
     QGroupBox *groupBox_4;
     QVBoxLayout *verticalLayout_7;
     QTextEdit *console;
+    QHBoxLayout *horizontalLayout_10;
+    QPushButton *pushButtonOpen;
+    QPushButton *pushButtonSave;
+    QPushButton *pushButtonHelp;
+    QSpacerItem *horizontalSpacer_3;
+    QCheckBox *checkBoxLoop;
     QHBoxLayout *horizontalLayout_4;
     QPushButton *pushButtonRun;
     QPushButton *pushButtonStop;
@@ -115,6 +121,35 @@ public:
 
         verticalLayout_7->addWidget(console);
 
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
+        pushButtonOpen = new QPushButton(groupBox_4);
+        pushButtonOpen->setObjectName(QString::fromUtf8("pushButtonOpen"));
+
+        horizontalLayout_10->addWidget(pushButtonOpen);
+
+        pushButtonSave = new QPushButton(groupBox_4);
+        pushButtonSave->setObjectName(QString::fromUtf8("pushButtonSave"));
+
+        horizontalLayout_10->addWidget(pushButtonSave);
+
+        pushButtonHelp = new QPushButton(groupBox_4);
+        pushButtonHelp->setObjectName(QString::fromUtf8("pushButtonHelp"));
+
+        horizontalLayout_10->addWidget(pushButtonHelp);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_10->addItem(horizontalSpacer_3);
+
+        checkBoxLoop = new QCheckBox(groupBox_4);
+        checkBoxLoop->setObjectName(QString::fromUtf8("checkBoxLoop"));
+
+        horizontalLayout_10->addWidget(checkBoxLoop);
+
+
+        verticalLayout_7->addLayout(horizontalLayout_10);
+
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         pushButtonRun = new QPushButton(groupBox_4);
@@ -125,7 +160,7 @@ public:
         sizePolicy1.setHeightForWidth(pushButtonRun->sizePolicy().hasHeightForWidth());
         pushButtonRun->setSizePolicy(sizePolicy1);
         pushButtonRun->setMinimumSize(QSize(0, 0));
-        pushButtonRun->setStyleSheet(QString::fromUtf8("background-color: \"darkgreen\";"));
+        pushButtonRun->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 128, 128);"));
 
         horizontalLayout_4->addWidget(pushButtonRun);
 
@@ -137,7 +172,7 @@ public:
         sizePolicy2.setHeightForWidth(pushButtonStop->sizePolicy().hasHeightForWidth());
         pushButtonStop->setSizePolicy(sizePolicy2);
         pushButtonStop->setMinimumSize(QSize(0, 0));
-        pushButtonStop->setStyleSheet(QString::fromUtf8("background-color: \"darkred\";"));
+        pushButtonStop->setStyleSheet(QString::fromUtf8("background-color: #e66100"));
 
         horizontalLayout_4->addWidget(pushButtonStop);
 
@@ -417,12 +452,20 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "M4N3D app", nullptr));
         groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "Program", nullptr));
+#if QT_CONFIG(tooltip)
+        console->setToolTip(QString());
+#endif // QT_CONFIG(tooltip)
         console->setHtml(QCoreApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "hr { height: 1px; border-width: 0; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 50 50 20</p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 100 50 20</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 100 -50 20</p></body></html>", nullptr));
+        pushButtonOpen->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
+        pushButtonSave->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
+        pushButtonHelp->setText(QCoreApplication::translate("MainWindow", "Help", nullptr));
+        checkBoxLoop->setText(QCoreApplication::translate("MainWindow", "Loop", nullptr));
         pushButtonRun->setText(QCoreApplication::translate("MainWindow", "RUN", nullptr));
         pushButtonStop->setText(QCoreApplication::translate("MainWindow", "STOP", nullptr));
         groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "Packets", nullptr));

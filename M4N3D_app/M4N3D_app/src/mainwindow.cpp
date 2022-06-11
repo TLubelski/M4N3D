@@ -1,5 +1,9 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include <QTextBlock>
+#include <QFileDialog>
+#include <QDir>
+#include <QToolTip>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,7 +34,22 @@ MainWindow::MainWindow(QWidget *parent)
     //logs
     QObject::connect(ui->pushButtonLogsClear, SIGNAL(pressed()), ui->textEditLogs, SLOT(clear()));
     QObject::connect(ui->pushButtonPacketsClear, SIGNAL(pressed()), ui->textEditPacket, SLOT(clear()));
+
+    QObject::connect(ui->pushButtonOpen, SIGNAL(pressed()), this, SLOT(handleOpen()));
+    QObject::connect(ui->pushButtonSave, SIGNAL(pressed()), this, SLOT(handleSave()));
+    QObject::connect(ui->pushButtonHelp, SIGNAL(clicked()), this, SLOT(showHelp()));
+
+    console_cursor = ui->console->textCursor();
+    format_normal.setBackground(Qt::transparent);
+    format_selected.setBackground(Qt::red);
+
+    ui->pushButtonDisconnect->setEnabled(false);
+    ui->pushButtonRun->setEnabled(false);
+    ui->pushButtonStop->setEnabled(false);
+
     handleSearch();
+    if(ui->comboBoxDevices->count() > 0)
+      handleConnect();
 }
 
 MainWindow::~MainWindow()
@@ -89,6 +108,12 @@ void MainWindow::handleConnect()
 
         this->addToLogs("Connected to " + portName);
         connect(this->device, SIGNAL(readyRead()), this, SLOT(readFromDevice()));
+
+        ui->pushButtonDisconnect->setEnabled(true);
+        ui->pushButtonConnect->setEnabled(false);
+        ui->pushButtonRun->setEnabled(true);
+        ui->pushButtonStop->setEnabled(true);
+
     }
     else
     {
@@ -105,6 +130,11 @@ void MainWindow::handleDisconnect()
     {
       this->device->close();
       this->addToLogs("Connection closed.");
+      ui->pushButtonDisconnect->setEnabled(false);
+      ui->pushButtonConnect->setEnabled(true);
+      ui->pushButtonRun->setEnabled(false);
+      ui->pushButtonStop->setEnabled(false);
+
     }
     else
     {
@@ -116,176 +146,42 @@ void MainWindow::handleDisconnect()
 // handles run section
 void MainWindow::handleRun()
 {
-    curr_index_of_words = 0;
     ui->textEditPacket->clear();
-    QString input = ui->console->toPlainText();
-    input.replace(" \n", " ");
-    input.replace("\n ", " ");
-    input.replace("\n", " ");
-    words = input.split(" ");
 
-    for(auto i = 0; i< words.size(); ++i)
-    {
-        if(words.at(i) == " " || words.at(i) == "\n" || words.at(i) == "")
-            words.removeAt(i);
-    }
+//    ui->textEditLogs->clear();
 
-    int is_code_ok = 0;
-    QRegularExpressionMatch match;
-    QRegularExpression regex("\\d+");
-
-    ui->textEditLogs->clear();
-    ui->textEditLogs->append("Running...");
-
-    for(auto i = 0; i < words.size(); ++i)
-    {
-        if(words.at(i) == "movel")
-        {
-            // doing this for next 4 arguments needed
-            for(int num=0; num < 3; ++num)
-            {
-                // check if there is next word
-                if(i+1 < words.size())
-                {
-                    match = regex.match(words.at(i+1));
-                    // check if word.at(i+1) is a number
-                    if(match.hasMatch())
-                    {
-                        is_code_ok = 1;
-                        i++;
-                    }
-                    // invalid argument given
-                    else
-                    {
-                        is_code_ok = 2;
-                        break;
-                    }
-                }
-            }
-            if(is_code_ok != 1) break;
-        }
-        else if(words.at(i) == "movej")
-        {
-            // doing this for next 4 arguments needed
-            for(int num=0; num < 3; ++num)
-            {
-                // check if there is next word
-                if(i+1 < words.size())
-                {
-                    match = regex.match(words.at(i+1));
-                    // check if word.at(i+1) is a number
-                    if(match.hasMatch())
-                    {
-                        is_code_ok = 1;
-                        i++;
-                    }
-                    // invalid argument given
-                    else
-                    {
-                        is_code_ok = 2;
-                        break;
-                    }
-                }
-            }
-            if(is_code_ok != 1) break;
-        }
-        // check 'wait' command
-        else if(words.at(i) == "wait")
-        {
-            // check if there is anything after 'wait' command
-            if(i+1 < words.size())
-            {
-                match = regex.match(words.at(i+1));
-                // check if 'wait' command is ok
-                if(match.hasMatch())
-                {
-                    is_code_ok = 1;
-                    i++;
-                }
-                // invalid argument given
-                else
-                {
-                    is_code_ok = 2;
-                    break;
-                }
-            }
-            // lack of argument
-            else
-            {
-                is_code_ok = 3;
-                break;
-            }
-        }
-        // check 'magnet' command
-        else if(words.at(i) == "magnet")
-        {
-            // check if there is anything after 'wait' command
-            if(i+1 < words.size())
-            {
-                // check if 'magnet' command is ok
-                if(words.at(i+1)== '0' || words.at(i+1)=='1')
-                {
-                    is_code_ok = 1;
-                    i++;
-                }
-                // invalid argument given
-                else
-                {
-                    is_code_ok = 2;
-                    break;
-                }
-            }
-            // lack of argument
-            else
-            {
-                is_code_ok = 3;
-                break;
-            }
-        }
-        // wrong function name
-        else
-        {
-            is_code_ok = 0;
-            break;
-        }
-    }
+    int is_code_ok = runChecker();
 
     switch(is_code_ok)
     {
         case 0:
-            ui->textEditLogs->append("Wrong function name.\nBreak");
+            addToLogs("Running...");
+//            addToLogs("Perfect, sending over UART.");
+            parseCommand();
+            emit stateUpdate(START);
             break;
         case 1:
-            ui->textEditLogs->append("Perfect, sending over UART.");
+            addToLogs("Wrong function name. Break");
             break;
         case 2:
-            ui->textEditLogs->append("Invalid argument.\nBreak");
+            addToLogs("Invalid argument. Break");
             break;
         case 3:
-            ui->textEditLogs->append("There is no argument.\nBreak");
+            addToLogs("There is no argument. Break");
             break;
-    }
-
-//    for( auto &elem: words)
-//      qDebug() << elem;
-
-     parseCommand();
-
-
-
-    if(is_code_ok == 1)
-    {
-        emit stateUpdate(START);
+        case 4:
+            addToLogs("Value out of range. Break");
+            break;
     }
 }
 
 void MainWindow::parseCommand()
 {
   float t1, t2, t3;
-  int i = 0;
+
   while(!cmd_queue.empty())cmd_queue.pop();
-  cmd_queue.push(std::make_shared<CmdStart>(i));
-  i++;
+  cmd_queue.push(std::make_shared<CmdStart>(-1));
+  int i = 0;
   auto iter = words.begin();
   while(iter != words.end())
   {
@@ -325,8 +221,8 @@ void MainWindow::parseCommand()
     }
     i++;
   }
-
-  cmd_queue.push(std::make_shared<CmdStop>(i));
+  if(!ui->checkBoxLoop->isChecked())
+    cmd_queue.push(std::make_shared<CmdStop>(-2));
 
   qDebug() << "SIZE: " << cmd_queue.size();
 
@@ -363,6 +259,146 @@ void MainWindow::addToLogs(QString message, bool error)
   QString type = (error) ? "ERROR: " : "";
   ui->textEditLogs->append(currDateTime + " | " + type + message);
 }
+
+int MainWindow::runChecker()
+{
+    // getting raw text
+    QString input = ui->console->toPlainText().toLower();
+    // setting up regex that replaces all whitespaces seqence with a single space
+    regex.setPattern("\\s\\s*");
+    // using regex
+    input.replace(regex, " ");
+    // remove single space from begin and end of text if exist
+    input = input.trimmed();
+    // splitting text after regex by single space
+    words = input.split(" ");
+
+//    for(auto i=words.begin(); i< words.end(); i++)
+//    {
+//        qDebug() << *i;
+//    }
+
+    // variable for error code
+    int is_code_ok = 0;
+
+    // creating regex for checking numbers
+    //regex.setPattern("\\d+");
+    regex.setPattern("^[-+]?[0-9]*$");
+
+    // iterating over words elements
+    for(int i=0; i < words.size(); ++i)
+    {
+        qDebug() << words.at(i);
+        // checking movel
+        if(words.at(i) == "movel")
+        {
+            // doing this for next 3 arguments needed
+            for(int num=0; num < 3; ++num)
+            {
+                // check if there is next word
+                if(i+1 < words.size())
+                {
+                    match = regex.match(words.at(i+1));
+                    // check if word.at(i+1) is a number
+                    if(match.hasMatch())
+                    {
+                        // checking range of value
+                        if(num==0 && words.at(i+1).toInt() >= 50 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        else if(num==1 && words.at(i+1).toInt() >= -200 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        // value out of range
+                        else return 4;
+                        i++;
+                    }
+                    // invalid argument given
+                    else return 2;
+                }
+                // lack of argument
+                else return 3;
+            }
+        }
+        // checking movej
+        else if(words.at(i) == "movej")
+        {
+            // doing this for next 3 arguments needed
+            for(int num=0; num < 3; ++num)
+            {
+                // check if there is next word
+                if(i+1 < words.size())
+                {
+                    match = regex.match(words.at(i+1));
+                    // check if word.at(i+1) is a number
+                    if(match.hasMatch())
+                    {
+                        // checking range of value
+                        if(num==0 && words.at(i+1).toInt() >= 50 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        else if(num==1 && words.at(i+1).toInt() >= -200 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= 200)
+                            is_code_ok = 0;
+                        // value out of range
+                        else return 4;
+                        i++;
+                    }
+                    // invalid argument given
+                    else return 2;
+                }
+                // lack of argument
+                else return 3;
+            }
+        }
+        // check 'wait' command
+        else if(words.at(i) == "wait")
+        {
+            // check if there is anything after 'wait' command
+            if(i+1 < words.size())
+            {
+                match = regex.match(words.at(i+1));
+                // check if param is number and >0
+                if(match.hasMatch())
+                {
+                    if( words.at(i+1).toInt() > 0)
+                        is_code_ok = 0;
+                    // value out of range
+                    else return 4;
+                    i++;
+                }
+                // invalid argument given
+                else return 2;
+            }
+            // lack of argument
+            else return 3;
+        }
+        // check 'magnet' command
+        else if(words.at(i) == "magnet")
+        {
+            // check if there is anything after 'wait' command
+            if(i+1 < words.size())
+            {
+                // check if 'magnet' command is ok
+                if(words.at(i+1)== '0' || words.at(i+1)=='1')
+                {
+                    is_code_ok = 0;
+                    i++;
+                }
+                // invalid argument given
+                else return 2;
+            }
+            // lack of argument
+            else return 3;
+        }
+        // wrong function name
+        else return 1;
+    }
+    // this is called only if everything was fines
+    return is_code_ok;
+}
+
+
 
 // read from device
 void MainWindow::readFromDevice()
@@ -475,10 +511,9 @@ void MainWindow::parseFrameBuffer()
       case DEBUG:
           for(int i=0; i < len; i++)
               error->push_back(frame_buffer.at(i+3));
-          ui->textEditLogs->append((char*)error);
+          addToLogs((char*)error);
           break;
       default:
-          ui->textEditLogs->append("Not possible, but readFromDevice fucked up :(");
       break;
   }
   delete error;
@@ -488,11 +523,15 @@ void MainWindow::parseFrameBuffer()
 
 void MainWindow::execInstructions(MSG msg)
 {
+    int index;
     switch(msg)
     {
         case STOP:
             while(!cmd_queue.empty()) cmd_queue.pop();
             sendPacket(CmdStop(-1).getPacket());
+            ui->checkBoxLoop->setChecked(false);
+            highlightReset();
+            ui->console->setReadOnly(false);
             break;
         case ACK:
             got_ack = true;
@@ -501,8 +540,19 @@ void MainWindow::execInstructions(MSG msg)
         case DONE:
             if( !cmd_queue.empty() )
             {
+                ui->console->setReadOnly(true);
+                index = cmd_queue.front()->getIndex();
+                if(index >= 0)
+                  highlightCodeLine(index);
                 sendPacket( cmd_queue.front()->getPacket() );
                 cmd_queue.pop();
+            }
+            else
+            {
+              ui->console->setReadOnly(false);
+              highlightReset();
+              if(ui->checkBoxLoop->isChecked())
+                handleRun();
             }
             break;
         case DEBUG:
@@ -532,6 +582,59 @@ void MainWindow::sendPacket(QByteArray data)
   ui->textEditPacket->append("<span style=' font-weight:700; color:#62a0ea;'>&gt;&gt;</span> 0x" + packet.toHex());
 }
 
+void MainWindow::highlightReset()
+{
+  console_cursor.select(QTextCursor::Document);
+  console_cursor.setBlockFormat(format_normal);
+}
+
+void MainWindow::highlightCodeLine(int line)
+{
+   highlightReset();
+   console_cursor = QTextCursor(ui->console->document()->findBlockByLineNumber(line));
+   console_cursor.setBlockFormat(format_selected);
+}
+
+
+void MainWindow::handleOpen()
+{
+  QString filename = QFileDialog::getOpenFileName(this, "Open Program", QDir::homePath(), "Program files (*.txt)");
+  if(filename != "")
+  {
+    qDebug() << filename;
+    QFile file(filename);
+    file.open(QFile::ReadOnly | QFile::Text);
+    QTextStream ReadFile(&file);
+    ui->console->clear();
+    ui->console->setText(ReadFile.readAll());
+    file.close();
+  }
+}
+void MainWindow::handleSave()
+{
+  QString filename = QFileDialog::getSaveFileName(this, "Save Program", QDir::homePath(), "Program files (*.txt)");
+  if(filename != "")
+  {
+    QFile file(filename);
+    file.open(QFile::WriteOnly | QFile::Text);
+    QString program = ui->console->toPlainText();
+    QTextStream WriteFile(&file);
+    WriteFile << program;
+    file.close();
+    }
+}
+
+void MainWindow::showHelp()
+{
+  QToolTip::showText(ui->console->mapToGlobal(QPoint(300,0)),
+  "<p><span style='font-weight:700;'>WAIT </span><span style='font-style:italic;'>ms</span> [0+]</p>"
+  "<p><span style='font-weight:700;'>MAGNET</span> <span style='font-style:italic;'>state</span> [0/1]</p>"
+  "<p><span style='font-weight:700;'>MOVEJ</span> <span style='font-style:italic;'>x y z</span></p>"
+  "<p><span style='font-weight:700;'>MOVEL</span> <span style='font-style:italic;'>x y z</span></p>"
+  "<p><span style='font-style:italic;'>x</span> [50; 200]</p>"
+  "<p><span style='font-style:italic;'>y </span>[-200; 200]</p>"
+  "<p><span style='font-style:italic;'>z </span>[0; 200]</p>");
+}
 
 
 

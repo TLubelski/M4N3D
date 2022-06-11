@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[22];
-    char stringdata0[233];
+    QByteArrayData data[29];
+    char stringdata0[313];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,25 +44,34 @@ QT_MOC_LITERAL(8, 72, 16), // "handleDisconnect"
 QT_MOC_LITERAL(9, 89, 9), // "handleRun"
 QT_MOC_LITERAL(10, 99, 10), // "handleStop"
 QT_MOC_LITERAL(11, 110, 16), // "updateDataStatus"
-QT_MOC_LITERAL(12, 127, 9), // "addToLogs"
-QT_MOC_LITERAL(13, 137, 7), // "message"
-QT_MOC_LITERAL(14, 145, 5), // "error"
-QT_MOC_LITERAL(15, 151, 14), // "readFromDevice"
-QT_MOC_LITERAL(16, 166, 16), // "parseFrameBuffer"
-QT_MOC_LITERAL(17, 183, 12), // "parseCommand"
-QT_MOC_LITERAL(18, 196, 16), // "execInstructions"
-QT_MOC_LITERAL(19, 213, 3), // "msg"
-QT_MOC_LITERAL(20, 217, 10), // "sendPacket"
-QT_MOC_LITERAL(21, 228, 4) // "data"
+QT_MOC_LITERAL(12, 127, 10), // "handleOpen"
+QT_MOC_LITERAL(13, 138, 10), // "handleSave"
+QT_MOC_LITERAL(14, 149, 8), // "showHelp"
+QT_MOC_LITERAL(15, 158, 9), // "addToLogs"
+QT_MOC_LITERAL(16, 168, 7), // "message"
+QT_MOC_LITERAL(17, 176, 5), // "error"
+QT_MOC_LITERAL(18, 182, 14), // "readFromDevice"
+QT_MOC_LITERAL(19, 197, 10), // "runChecker"
+QT_MOC_LITERAL(20, 208, 16), // "parseFrameBuffer"
+QT_MOC_LITERAL(21, 225, 12), // "parseCommand"
+QT_MOC_LITERAL(22, 238, 16), // "execInstructions"
+QT_MOC_LITERAL(23, 255, 3), // "msg"
+QT_MOC_LITERAL(24, 259, 10), // "sendPacket"
+QT_MOC_LITERAL(25, 270, 4), // "data"
+QT_MOC_LITERAL(26, 275, 14), // "highlightReset"
+QT_MOC_LITERAL(27, 290, 17), // "highlightCodeLine"
+QT_MOC_LITERAL(28, 308, 4) // "line"
 
     },
     "MainWindow\0stateUpdate\0\0MSG\0msgs\0"
     "dataArrived\0handleSearch\0handleConnect\0"
     "handleDisconnect\0handleRun\0handleStop\0"
-    "updateDataStatus\0addToLogs\0message\0"
-    "error\0readFromDevice\0parseFrameBuffer\0"
+    "updateDataStatus\0handleOpen\0handleSave\0"
+    "showHelp\0addToLogs\0message\0error\0"
+    "readFromDevice\0runChecker\0parseFrameBuffer\0"
     "parseCommand\0execInstructions\0msg\0"
-    "sendPacket\0data"
+    "sendPacket\0data\0highlightReset\0"
+    "highlightCodeLine\0line"
 };
 #undef QT_MOC_LITERAL
 
@@ -72,7 +81,7 @@ static const uint qt_meta_data_MainWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      15,   14, // methods
+      21,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -80,23 +89,29 @@ static const uint qt_meta_data_MainWindow[] = {
        2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   89,    2, 0x06 /* Public */,
-       5,    0,   92,    2, 0x06 /* Public */,
+       1,    1,  119,    2, 0x06 /* Public */,
+       5,    0,  122,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    0,   93,    2, 0x08 /* Private */,
-       7,    0,   94,    2, 0x08 /* Private */,
-       8,    0,   95,    2, 0x08 /* Private */,
-       9,    0,   96,    2, 0x08 /* Private */,
-      10,    0,   97,    2, 0x08 /* Private */,
-      11,    0,   98,    2, 0x08 /* Private */,
-      12,    2,   99,    2, 0x08 /* Private */,
-      12,    1,  104,    2, 0x28 /* Private | MethodCloned */,
-      15,    0,  107,    2, 0x08 /* Private */,
-      16,    0,  108,    2, 0x08 /* Private */,
-      17,    0,  109,    2, 0x08 /* Private */,
-      18,    1,  110,    2, 0x08 /* Private */,
-      20,    1,  113,    2, 0x08 /* Private */,
+       6,    0,  123,    2, 0x08 /* Private */,
+       7,    0,  124,    2, 0x08 /* Private */,
+       8,    0,  125,    2, 0x08 /* Private */,
+       9,    0,  126,    2, 0x08 /* Private */,
+      10,    0,  127,    2, 0x08 /* Private */,
+      11,    0,  128,    2, 0x08 /* Private */,
+      12,    0,  129,    2, 0x08 /* Private */,
+      13,    0,  130,    2, 0x08 /* Private */,
+      14,    0,  131,    2, 0x08 /* Private */,
+      15,    2,  132,    2, 0x08 /* Private */,
+      15,    1,  137,    2, 0x28 /* Private | MethodCloned */,
+      18,    0,  140,    2, 0x08 /* Private */,
+      19,    0,  141,    2, 0x08 /* Private */,
+      20,    0,  142,    2, 0x08 /* Private */,
+      21,    0,  143,    2, 0x08 /* Private */,
+      22,    1,  144,    2, 0x08 /* Private */,
+      24,    1,  147,    2, 0x08 /* Private */,
+      26,    0,  150,    2, 0x08 /* Private */,
+      27,    1,  151,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -109,13 +124,19 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::Bool,   13,   14,
-    QMetaType::Void, QMetaType::QString,   13,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 3,   19,
-    QMetaType::Void, QMetaType::QByteArray,   21,
+    QMetaType::Void, QMetaType::QString, QMetaType::Bool,   16,   17,
+    QMetaType::Void, QMetaType::QString,   16,
+    QMetaType::Void,
+    QMetaType::Int,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 3,   23,
+    QMetaType::Void, QMetaType::QByteArray,   25,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   28,
 
        0        // eod
 };
@@ -134,13 +155,20 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->handleRun(); break;
         case 6: _t->handleStop(); break;
         case 7: _t->updateDataStatus(); break;
-        case 8: _t->addToLogs((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
-        case 9: _t->addToLogs((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 10: _t->readFromDevice(); break;
-        case 11: _t->parseFrameBuffer(); break;
-        case 12: _t->parseCommand(); break;
-        case 13: _t->execInstructions((*reinterpret_cast< MSG(*)>(_a[1]))); break;
-        case 14: _t->sendPacket((*reinterpret_cast< QByteArray(*)>(_a[1]))); break;
+        case 8: _t->handleOpen(); break;
+        case 9: _t->handleSave(); break;
+        case 10: _t->showHelp(); break;
+        case 11: _t->addToLogs((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 12: _t->addToLogs((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 13: _t->readFromDevice(); break;
+        case 14: { int _r = _t->runChecker();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 15: _t->parseFrameBuffer(); break;
+        case 16: _t->parseCommand(); break;
+        case 17: _t->execInstructions((*reinterpret_cast< MSG(*)>(_a[1]))); break;
+        case 18: _t->sendPacket((*reinterpret_cast< QByteArray(*)>(_a[1]))); break;
+        case 19: _t->highlightReset(); break;
+        case 20: _t->highlightCodeLine((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -191,13 +219,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 15)
+        if (_id < 21)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 15;
+        _id -= 21;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 15)
+        if (_id < 21)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 15;
+        _id -= 21;
     }
     return _id;
 }

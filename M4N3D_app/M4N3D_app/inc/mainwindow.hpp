@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <queue>
 #include <memory>
+#include <QRegularExpressionMatch>
 
 #include "communication.hpp"
 #include "command.hpp"
@@ -48,13 +49,18 @@ private:
     qreal x, y, z, speed;
     QByteArray frame_buffer;
     bool is_frame_ok;
-    bool is_frame_partial;
     bool is_frame_full;
     MSG msg_type;
     bool got_ack;
     float x_in, y_in, z_in, j1, j2, j3;
-    int curr_index_of_words = 0;
     std::queue<std::shared_ptr<CmdInterface>> cmd_queue;
+
+    QRegularExpressionMatch match;
+    QRegularExpression regex;
+    //highlighting
+    QTextBlockFormat format_normal;
+    QTextBlockFormat format_selected;
+    QTextCursor console_cursor;
 private slots:
 
     //************************* UI SECTION *************************
@@ -70,12 +76,17 @@ private slots:
     void handleStop();
     // prints x, y, z, theta in form layout
     void updateDataStatus();
+    void handleOpen();
+    void handleSave();
+    void showHelp();
 
     //************************ LOGIC SECTION ************************
     // adds message to the textEditLog widget
     void addToLogs(QString message, bool error = false);
     // read data from device
     void readFromDevice();
+    // checker for instructions
+    int runChecker();
     //parse full
     void parseFrameBuffer();
     //parse command
@@ -84,6 +95,10 @@ private slots:
     void execInstructions(MSG msg);
     // send dataframe to robot
     void sendPacket(QByteArray data);
+    //highlighting
+    void highlightReset();
+    void highlightCodeLine(int line);
+
 
 };
 #endif // MAINWINDOW_HPP
