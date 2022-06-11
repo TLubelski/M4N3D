@@ -1,3 +1,4 @@
+"./Core/Src/comm.o"
 "./Core/Src/control.o"
 "./Core/Src/kinematics.o"
 "./Core/Src/main.o"

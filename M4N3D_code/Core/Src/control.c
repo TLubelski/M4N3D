@@ -2,6 +2,8 @@
 
 MoveVect_t MoveVect;
 RobotParams_t RobotParams;
+CommandParms_t CommandParams;
+
 
 void RobotParams_Init(double l1, double l2, double l3, double l4, double l5, double q1_off, double q2_off, double q3_off )
 {
@@ -20,6 +22,7 @@ void RobotParams_Init(double l1, double l2, double l3, double l4, double l5, dou
     RobotParams.q3 = q3_off;
 
     RobotParams.fxState = false;
+    RobotParams.mode = MANUAL;
 
     MoveVect.x = 0;
     MoveVect.y = 0;
@@ -27,9 +30,9 @@ void RobotParams_Init(double l1, double l2, double l3, double l4, double l5, dou
 }
 
 
-void toggleFx()
+void CTRL_setFx(uint8_t state)
 {
-	RobotParams.fxState = !RobotParams.fxState;
+	RobotParams.fxState = state;
 	HAL_GPIO_WritePin(EFFECTOR_GPIO_Port, EFFECTOR_Pin, RobotParams.fxState);
 	PAD_setLedFx(RobotParams.fxState);
 }
@@ -58,31 +61,25 @@ void CTRL_getRealParams()
 
 void CTRL_pushTargetParams()
 {
-	SRV_move(1, rad2srv(RobotParams.q1), MANUAL_SPEED);
-	SRV_move(2, rad2srv(RobotParams.q2), MANUAL_SPEED);
-	SRV_move(3, rad2srv(RobotParams.q3), MANUAL_SPEED);
+	SRV_move(1, rad2srv(RobotParams.q1), SPEED);
+	SRV_move(2, rad2srv(RobotParams.q2), SPEED);
+	SRV_move(3, rad2srv(RobotParams.q3), SPEED);
 }
 
-bool CTRL_destinationReached_J()
+bool CTRL_destinationReached()
 {
-	return ( fabs(RobotParams.q1-RobotParams.aq1) < THRESHOLD_J &&
-			 fabs(RobotParams.q2-RobotParams.aq2) < THRESHOLD_J &&
-			 fabs(RobotParams.q3-RobotParams.aq3) < THRESHOLD_J    );
+	return ( fabs(RobotParams.q1-RobotParams.aq1) < deg2rad(THRESHOLD_J) &&
+			 fabs(RobotParams.q2-RobotParams.aq2) < deg2rad(THRESHOLD_J) &&
+			 fabs(RobotParams.q3-RobotParams.aq3) < deg2rad(THRESHOLD_J) );
 }
 
-bool CTRL_destinationReached_L()
-{
-	return ( fabs(RobotParams.x-RobotParams.ax) < THRESHOLD_L &&
-			 fabs(RobotParams.y-RobotParams.ay) < THRESHOLD_L &&
-			 fabs(RobotParams.z-RobotParams.az) < THRESHOLD_L    );
-}
 
 void CTRL_setPos(double x, double y, double z)
 {
 	if(KS_calc_IK(x, y, z))
 		CTRL_pushTargetParams();
 	else
-		printf("Inverse kinematics error\r\n");
+		printf("Inverse kinematics error");
 }
 
 void CTRL_startup()
@@ -104,30 +101,118 @@ void CTRL_moveByVect()
 		CTRL_setPos(RobotParams.x+MoveVect.x, RobotParams.y+MoveVect.y, RobotParams.z+MoveVect.z);
 }
 
-
-void CTRL_Loop_Manual()
+void CTRL_printInfo()
 {
 	static uint32_t last_print = 0;
 	uint32_t now = HAL_GetTick();
 
-	if( now-last_print > 100 )
+	if( now-last_print > INFO_INTERVAL )
 	{
-		printf("#PAD RX: %d, RY: %d, LX: %d, LY: %d\r\n", PAD.axis_R_X, PAD.axis_R_Y, PAD.axis_L_X, PAD.axis_L_Y);
-		printf("#VECT X: %.2f, Y: %.2f, Z: %.2f\r\n", MoveVect.x, MoveVect.y, MoveVect.z);
-		printf("#TARGET: Q1: %.2f, Q1: %.2f, Q1: %.2f, X: %.2f, Y: %.2f, Z: %.2f\r\n", RobotParams.q1, RobotParams.q2, RobotParams.q3, RobotParams.x, RobotParams.y, RobotParams.z);
-		printf("#ACTUAL: Q1: %.2f, Q1: %.2f, Q1: %.2f, X: %.2f, Y: %.2f, Z: %.2f\r\n", RobotParams.aq1, RobotParams.aq2, RobotParams.aq3, RobotParams.ax, RobotParams.ay, RobotParams.az);
-
+		COM_sendInfo(RobotParams.ax, RobotParams.ay, RobotParams.az, RobotParams.aq1, RobotParams.aq2, RobotParams.aq3, RobotParams.fxState);
 		last_print = now;
 	}
+}
 
-	if( PAD.btn_combo_short )
-		toggleFx();
-
-
-	CTRL_getMoveVect();
-	if( CTRL_destinationReached_J() )
+void CTRL_parseCommand()
+{
+	HAL_Delay(1);
+	switch(COM_data.cmd)
 	{
-		CTRL_moveByVect();
+	case CMD_START:
+		PAD_setLedManual(0);
+		RobotParams.mode = PROGRAM;
+		CommandParams.type = IDLE;
+		COM_sendDone();
+		break;
+
+	case CMD_STOP:
+		PAD_setLedManual(1);
+		RobotParams.mode = MANUAL;
+		COM_sendDone();
+		break;
+
+	case CMD_MOVE_J:
+		CommandParams.type = MOVING_J;
+		CommandParams.x = COM_data.f_param1;
+		CommandParams.y = COM_data.f_param2;
+		CommandParams.z = COM_data.f_param3;
+		CTRL_setPos(CommandParams.x, CommandParams.y, CommandParams.z);
+		break;
+
+	case CMD_MOVE_L:
+		CommandParams.type = MOVING_L;
+		CommandParams.x = COM_data.f_param1;
+		CommandParams.y = COM_data.f_param2;
+		CommandParams.z = COM_data.f_param3;
+		CTRL_setPos(CommandParams.x, CommandParams.y, CommandParams.z);
+		break;
+
+	case CMD_WAIT:
+		CommandParams.type = WAIT;
+		CommandParams.start = HAL_GetTick();
+		CommandParams.timer = COM_data.u32_param;
+		break;
+
+	case CMD_MAGNET:
+		CTRL_setFx(COM_data.u8_param);
+		COM_sendDone();
+		break;
+	}
+
+	COM_data.available = 0;
+}
+
+void CTRL_Loop()
+{
+	if(COM_data.available)
+		CTRL_parseCommand();
+
+	if(RobotParams.mode == MANUAL)
+	{
+		CTRL_getMoveVect();
+
+		if( PAD.btn_combo_short )
+			CTRL_setFx(!RobotParams.fxState);
+
+		if( PAD.btn_combo_long )
+			CTRL_setPos(134, -33, 88);
+
+		if( CTRL_destinationReached() )
+		{
+			CTRL_moveByVect();
+		}
+	}
+	else if(RobotParams.mode == PROGRAM)
+	{
+		switch( CommandParams.type )
+		{
+		case IDLE:
+			break;
+
+		case WAIT:
+			if( HAL_GetTick()-CommandParams.start > CommandParams.timer )
+			{
+				CommandParams.type = IDLE;
+				COM_sendDone();
+			}
+			break;
+
+		case MOVING_J:
+			if( CTRL_destinationReached() )
+			{
+				CommandParams.type = IDLE;
+				COM_sendDone();
+			}
+			break;
+
+		case MOVING_L:
+			if( CTRL_destinationReached() )
+			{
+				CommandParams.type = IDLE;
+				COM_sendDone();
+			}
+			break;
+		}
 	}
 }
 

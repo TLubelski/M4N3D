@@ -24,6 +24,7 @@
 #include "servo.h"
 #include "pad.h"
 #include "control.h"
+#include "comm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,7 +40,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #define TIMEOUT 3000
-#define SPEED 35
 #define L1 44.5
 #define L2 83.2
 #define L3 136.3
@@ -74,15 +74,16 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int _write(int file, unsigned char *ptr, int len)
-{
-	HAL_UART_Transmit(&huart2, ptr, len, 50);
-	return len;
-}
+//int _write(int file, unsigned char *ptr, int len)
+//{
+//	HAL_UART_Transmit(&huart2, ptr, len, 50);
+//	return len;
+//}
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	SRV_uartIRQ(huart);
+	COM_uartIRQ(huart);
 }
 
 /* USER CODE END 0 */
@@ -122,6 +123,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SRV_Init(&huart1);
   PAD_Init(&hadc1);
+  COM_Init(&huart2);
   RobotParams_Init(L1, L2, L3, L4, L5, deg2rad(Q1_OFF), deg2rad(Q2_OFF), deg2rad(Q3_OFF));
   /* USER CODE END 2 */
 
@@ -130,17 +132,21 @@ int main(void)
 
   HAL_Delay(1000);
 
-  printf("System started\r\n");
+  printf("System started");
 
   CTRL_startup();
 
   while (1)
   {
 	  PAD_updateState();
+
 	  CTRL_getRealParams();
 
-	  CTRL_Loop_Manual();
+	  COM_rxLoop();
 
+	  CTRL_printInfo();
+
+	  CTRL_Loop();
 
     /* USER CODE END WHILE */
 

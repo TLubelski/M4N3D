@@ -4,12 +4,14 @@
 #include "main.h"
 #include "servo.h"
 #include "pad.h"
+#include "comm.h"
 #include "kinematics.h"
 #include <stdbool.h>
 
 #define GETREAL_INTERVAL 10
-#define MANUAL_SPEED 35
-#define THRESHOLD_J 3
+#define INFO_INTERVAL 1000
+#define SPEED 35
+#define THRESHOLD_J 5
 #define THRESHOLD_L 2
 
 typedef struct{
@@ -17,6 +19,9 @@ typedef struct{
 } MoveVect_t;
 
 extern MoveVect_t MoveVect;
+
+typedef enum {MANUAL, PROGRAM}CTRL_Mode_t;
+typedef enum {IDLE, MOVING_J, MOVING_L, WAIT}CTRL_MoveType_t;
 
 typedef struct{
 	//params
@@ -28,9 +33,26 @@ typedef struct{
     //actual values
     double aq1, aq2, aq3;
     double ax, ay, az;
-    //
+    // fx
     bool fxState;
+    // mode
+    CTRL_Mode_t mode;
+
+
 } RobotParams_t;
+
+typedef struct{
+	CTRL_MoveType_t type;
+	float x;
+	float y;
+	float z;
+	float step_x;
+	float step_y;
+	float step_z;
+	uint32_t start;
+	uint32_t timer;
+} CommandParms_t;
+
 
 extern RobotParams_t RobotParams;
 
@@ -43,6 +65,7 @@ bool CTRL_destinationReached_L();
 void CTRL_setPos(double x, double y, double z);
 void CTRL_startup();
 void CTRL_moveByVect();
-void CTRL_Loop_Manual();
+void CTRL_printInfo();
+void CTRL_Loop();
 
 #endif

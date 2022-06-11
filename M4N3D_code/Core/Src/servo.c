@@ -9,16 +9,16 @@
 #define UART_TIMEOUT 50
 UART_HandleTypeDef* huart_srv;
 
-#define RX_BUFF_SIZE 16
-volatile uint8_t RxBuff[RX_BUFF_SIZE];
-volatile uint8_t* rx_head;
-volatile uint8_t* rx_tail;
+#define SRV_RX_BUFF_SIZE 16
+volatile uint8_t SRV_RxBuff[SRV_RX_BUFF_SIZE];
+volatile uint8_t* SRV_rx_head;
+volatile uint8_t* SRV_rx_tail;
 
 
 void SRV_uartClearBuff()
 {
-	rx_head = RxBuff;
-	rx_tail = RxBuff;
+	SRV_rx_head = SRV_RxBuff;
+	SRV_rx_tail = SRV_RxBuff;
 }
 
 static inline void SRV_uartStopRx()
@@ -28,33 +28,33 @@ static inline void SRV_uartStopRx()
 
 static inline void SRV_uartStartRx()
 {
-	HAL_UART_Receive_IT(huart_srv, (uint8_t*)rx_head, 1);
+	HAL_UART_Receive_IT(huart_srv, (uint8_t*)SRV_rx_head, 1);
 }
 
 void SRV_uartIRQ(UART_HandleTypeDef* huart)
 {
 	if(huart == huart_srv)
 	{
-		rx_head++;
-		if( rx_head == RxBuff+RX_BUFF_SIZE)
-			rx_head = RxBuff;
+		SRV_rx_head++;
+		if( SRV_rx_head == SRV_RxBuff+SRV_RX_BUFF_SIZE)
+			SRV_rx_head = SRV_RxBuff;
 		SRV_uartStartRx();
 	}
 }
 
 uint8_t SRV_uartDataAvailable()
 {
-	return rx_head-rx_tail;
+	return SRV_rx_head-SRV_rx_tail;
 }
 
 uint8_t SRV_uartReadByte()
 {
-	return *(rx_tail++);
+	return *(SRV_rx_tail++);
 }
 
 uint8_t SRV_uartPeek()
 {
-	return *(rx_tail);
+	return *(SRV_rx_tail);
 }
 
 void SRV_uartSendPacket(uint8_t* packet, uint8_t len)
