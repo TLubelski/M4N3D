@@ -26,7 +26,9 @@ void COM_Init(UART_HandleTypeDef* huart);
 void COM_uartIRQ(UART_HandleTypeDef* huart);
 void COM_rxLoop();
 void COM_sendDone();
+void COM_sendPacket(uint8_t* data, uint8_t d_len);
 void COM_sendInfo(float x, float y, float z, float q1, float q2, float q3, uint8_t magnet);
-
+void COM_sendMsg(const char* msg);
+void print(const char *fmt, ...);
 
 #endif

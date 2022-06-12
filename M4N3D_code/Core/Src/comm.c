@@ -1,6 +1,8 @@
 #include "comm.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 typedef union {
     float var;
@@ -24,7 +26,6 @@ volatile uint8_t* COM_rx_head;
 
 void COM_parsePacket();
 void COM_sendACK();
-
 
 void COM_clearBuff()
 {
@@ -103,13 +104,13 @@ void COM_rxLoop()
 {
 	if( COM_state == COM_CPLT)
 	{
+		uint8_t len = COM_RxBuff[2];
 		uint8_t checksum = 0;
-		for( uint8_t i = 2; i < COM_data_len-1; i++)
+		for( uint8_t i = 2; i < len+3; i++)
 			checksum += COM_RxBuff[i];
 		checksum = ( ~checksum ) & 0xFF;
 
-//		if( checksum == COM_RxBuff[2+COM_data_len] )
-		if(1)
+		if( checksum == COM_RxBuff[len+3] )
 		{
 			COM_parsePacket();
 			COM_data.available = 1;
@@ -173,7 +174,8 @@ void COM_sendPacket(uint8_t* data, uint8_t d_len)
 	packet[len-1] = '\n';
 
 	//send via uart
-	HAL_UART_Transmit(huart_com, packet, len, 10);
+	HAL_UART_Transmit(huart_com, packet, len, 100);
+	HAL_Delay(1);
 }
 
 void COM_sendACK()
@@ -207,14 +209,30 @@ void COM_sendInfo(float x, float y, float z, float q1, float q2, float q3, uint8
 	COM_sendPacket(packet, len);
 }
 
-int _write(int file, unsigned char *ptr, int len)
+void COM_sendMsg(const char* msg)
 {
-	uint8_t packet[len+1];
-	packet[0] = COM_MSG;
-	memcpy(packet+1, ptr, len);
-	COM_sendPacket(packet, len+1);
-	return len;
+	static uint8_t msg_buff[201];
+	msg_buff[0] = COM_MSG;
+	uint8_t i = 0;
+	while( msg[i] != '\0' )
+	{
+		msg_buff[i+1] = msg[i];
+		i++;
+	}
+	COM_sendPacket(msg_buff, i+1);
 }
+
+
+void print(const char *fmt, ...)
+{
+	char string[200];
+	va_list argp;
+	va_start(argp, fmt);
+    if(0 < vsprintf(string,fmt,argp))
+        COM_sendMsg((const char*)string);
+	va_end(argp);
+}
+
 
 
 

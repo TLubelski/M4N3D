@@ -39,15 +39,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define TIMEOUT 3000
-#define L1 44.5
-#define L2 83.2
-#define L3 136.3
-#define L4 31.75
-#define L5 37.6
-#define Q1_OFF 0
-#define Q2_OFF 16
-#define Q3_OFF -5
+
 
 /* USER CODE END PM */
 
@@ -121,10 +113,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+
   SRV_Init(&huart1);
   PAD_Init(&hadc1);
   COM_Init(&huart2);
-  RobotParams_Init(L1, L2, L3, L4, L5, deg2rad(Q1_OFF), deg2rad(Q2_OFF), deg2rad(Q3_OFF));
+  KS_InitParams();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,20 +126,21 @@ int main(void)
 
   HAL_Delay(1000);
 
-  printf("System started");
-
   CTRL_startup();
 
   while (1)
   {
+	  //Get actual robot state
 	  PAD_updateState();
+	  KS_getActualPos();
 
-	  CTRL_getRealParams();
-
+	  //Receive command from app
 	  COM_rxLoop();
 
+	  //Send stats to app
 	  CTRL_printInfo();
 
+	  //Do movement
 	  CTRL_Loop();
 
     /* USER CODE END WHILE */

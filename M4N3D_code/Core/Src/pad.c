@@ -1,5 +1,6 @@
 #include "pad.h"
 
+LED_State_t LED_state = LED_ON;
 
 volatile uint16_t adc_data[4];
 PadState_t PAD;
@@ -41,6 +42,8 @@ void PAD_updateState()
 	uint8_t raw_rb;
 
 	static uint32_t last_combo = 0;
+
+	static uint32_t last_blink = 0;
 
 
 	// ##### HANDLE ADC #####
@@ -189,9 +192,22 @@ void PAD_updateState()
 		PAD.btn_R_long = false;
 	}
 
+	if( LED_state == LED_BLINK && now-last_blink > BLINK_TIME )
+	{
+		HAL_GPIO_TogglePin(LED_MANUAL_GPIO_Port, LED_MANUAL_Pin);
+		last_blink = now;
+	}
 }
 
-inline void PAD_setLedManual(bool state) { HAL_GPIO_WritePin(LED_MANUAL_GPIO_Port, LED_MANUAL_Pin, state); }
+void PAD_setLedManual(LED_State_t state)
+{
+	LED_state = state;
+	if( state != LED_BLINK)
+		HAL_GPIO_WritePin(LED_MANUAL_GPIO_Port, LED_MANUAL_Pin, state);
+}
 
-inline void PAD_setLedFx(bool state) { HAL_GPIO_WritePin(LED_EFFECTOR_GPIO_Port, LED_EFFECTOR_Pin, state); }
+inline void PAD_setLedFx(bool state)
+{
+	HAL_GPIO_WritePin(LED_EFFECTOR_GPIO_Port, LED_EFFECTOR_Pin, state);
+}
 
