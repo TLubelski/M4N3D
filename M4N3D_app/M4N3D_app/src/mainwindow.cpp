@@ -74,7 +74,7 @@ void MainWindow::handleSearch()
             if(devices.at(i).portName() != "ttyS0")
             {
                 this->addToLogs("Found " + devices.at(i).portName() + " " + devices.at(i).description());
-                ui->comboBoxDevices->addItem(devices.at(i).portName());
+                ui->comboBoxDevices->addItem( devices.at(i).portName() + " (" + devices.at(i).description() + ")", devices.at(i).portName());
             }
         }
     }
@@ -94,7 +94,7 @@ void MainWindow::handleConnect()
         return;
     }
 
-    QString portName = "/dev/" + ui->comboBoxDevices->currentText();
+    QString portName = "/dev/" + ui->comboBoxDevices->currentData().toString();
     this->device->setPortName(portName);
     //qDebug() << portName;
 
@@ -303,14 +303,15 @@ int MainWindow::runChecker()
                     if(match.hasMatch())
                     {
                         // checking range of value
-                        if(num==0 && words.at(i+1).toInt() >= 50 && words.at(i+1).toInt() <= 200)
+                        if(num==0 && words.at(i+1).toInt() >= (-XY_LIMIT) && words.at(i+1).toInt() <= XY_LIMIT)
                             is_code_ok = 0;
-                        else if(num==1 && words.at(i+1).toInt() >= -200 && words.at(i+1).toInt() <= 200)
+                        else if(num==1 && words.at(i+1).toInt() >= (-XY_LIMIT) && words.at(i+1).toInt() <= XY_LIMIT)
                             is_code_ok = 0;
-                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= 200)
+                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= Z_LIMIT)
                             is_code_ok = 0;
                         // value out of range
                         else return 4;
+
                         i++;
                     }
                     // invalid argument given
@@ -334,14 +335,15 @@ int MainWindow::runChecker()
                     if(match.hasMatch())
                     {
                         // checking range of value
-                        if(num==0 && words.at(i+1).toInt() >= 50 && words.at(i+1).toInt() <= 200)
+                        if(num==0 && words.at(i+1).toInt() >= (-XY_LIMIT) && words.at(i+1).toInt() <= XY_LIMIT)
                             is_code_ok = 0;
-                        else if(num==1 && words.at(i+1).toInt() >= -200 && words.at(i+1).toInt() <= 200)
+                        else if(num==1 && words.at(i+1).toInt() >= (-XY_LIMIT) && words.at(i+1).toInt() <= XY_LIMIT)
                             is_code_ok = 0;
-                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= 200)
+                        else if(num==2 && words.at(i+1).toInt() >= 0 && words.at(i+1).toInt() <= Z_LIMIT)
                             is_code_ok = 0;
                         // value out of range
                         else return 4;
+
                         i++;
                     }
                     // invalid argument given
@@ -432,7 +434,11 @@ void MainWindow::readFromDevice()
             len = frame_buffer.at(2);
             if( len+5 == frame_buffer.length())
               is_frame_full = true;
-            else
+            else if(len+5 > frame_buffer.length())
+            {
+              addToLogs("Packet split", 1);
+            }
+            else if(len+5 < frame_buffer.length())
             {
               frame_buffer.clear();
               addToLogs("Packet malformed", 1);
@@ -483,7 +489,7 @@ void MainWindow::parseFrameBuffer()
   floatArray f_pool;
   msg_type = (MSG)frame_buffer.at(3);
   int len = frame_buffer.at(2);
-  std::vector<uint8_t> *error = new std::vector<uint8_t>;
+  QString error;
 
   switch(msg_type)
   {
@@ -509,14 +515,14 @@ void MainWindow::parseFrameBuffer()
           emit dataArrived();
           break;
       case DEBUG:
-          for(int i=0; i < len; i++)
-              error->push_back(frame_buffer.at(i+3));
-          addToLogs((char*)error);
+          qDebug() << frame_buffer.toHex();
+          for(int i=0; i < len-1; i++)
+              error.append(frame_buffer.at(i+4));
+          addToLogs("ROBOT: " + error);
           break;
       default:
-      break;
+          break;
   }
-  delete error;
 }
 
 
@@ -556,6 +562,8 @@ void MainWindow::execInstructions(MSG msg)
             }
             break;
         case DEBUG:
+            break;
+        default:
             break;
     }
 }
@@ -627,13 +635,13 @@ void MainWindow::handleSave()
 void MainWindow::showHelp()
 {
   QToolTip::showText(ui->console->mapToGlobal(QPoint(300,0)),
-  "<p><span style='font-weight:700;'>WAIT </span><span style='font-style:italic;'>ms</span> [0+]</p>"
+  "<p><span style='font-weight:700;'>WAIT </span><span style='font-style:italic;'>ms</span> [1+]</p>"
   "<p><span style='font-weight:700;'>MAGNET</span> <span style='font-style:italic;'>state</span> [0/1]</p>"
   "<p><span style='font-weight:700;'>MOVEJ</span> <span style='font-style:italic;'>x y z</span></p>"
   "<p><span style='font-weight:700;'>MOVEL</span> <span style='font-style:italic;'>x y z</span></p>"
-  "<p><span style='font-style:italic;'>x</span> [50; 200]</p>"
-  "<p><span style='font-style:italic;'>y </span>[-200; 200]</p>"
-  "<p><span style='font-style:italic;'>z </span>[0; 200]</p>");
+  "<p><span style='font-style:italic;'>x</span> [-80; 80]</p>"
+  "<p><span style='font-style:italic;'>y </span>[-80; 80]</p>"
+  "<p><span style='font-style:italic;'>z </span>[0; 150]</p>");
 }
 
 

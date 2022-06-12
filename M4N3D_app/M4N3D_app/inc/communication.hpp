@@ -35,4 +35,9 @@ typedef union {
     uint8_t bytes[4];
 } u32Array;
 
+#define XY_LIMIT 80
+#define Z_LIMIT 150
+
+
+
 #endif // COMMUNICATION_HPP

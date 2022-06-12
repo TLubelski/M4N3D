@@ -7,7 +7,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -27,13 +27,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -45,7 +45,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -70,10 +70,10 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src/main.cpp"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src/main.cpp"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src/main.cpp"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src/main.cpp"
 },
 {
     "arguments": [
@@ -83,7 +83,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -103,13 +103,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -121,7 +121,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -146,10 +146,10 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src/mainwindow.cpp"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src/mainwindow.cpp"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src/mainwindow.cpp"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src/mainwindow.cpp"
 },
 {
     "arguments": [
@@ -159,7 +159,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -179,13 +179,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -197,7 +197,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -222,10 +222,10 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/command.hpp"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/command.hpp"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/command.hpp"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/command.hpp"
 },
 {
     "arguments": [
@@ -235,7 +235,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -255,13 +255,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -273,7 +273,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -298,10 +298,10 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/communication.hpp"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/communication.hpp"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/communication.hpp"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/communication.hpp"
 },
 {
     "arguments": [
@@ -311,7 +311,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -331,13 +331,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -349,7 +349,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -374,10 +374,10 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/mainwindow.hpp"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/mainwindow.hpp"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc/mainwindow.hpp"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc/mainwindow.hpp"
 },
 {
     "arguments": [
@@ -387,7 +387,7 @@
         "-I",
         "/usr/share/qtcreator/cplusplus/wrappedQtHeaders/QtCore",
         "-I",
-        "/tmp/QtCreator-EBmXIe/clang-uiheader-ckjKpv",
+        "/tmp/QtCreator-vgKbAE/clang-uiheader-GhsFAf",
         "-nostdinc",
         "-nostdinc++",
         "-pipe",
@@ -407,13 +407,13 @@
         "-DQT_SERIALPORT_LIB",
         "-DQT_CORE_LIB",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui",
         "-I",
         "/usr/include/qt",
         "-I",
@@ -425,7 +425,7 @@
         "-I",
         "/usr/include/qt/QtCore",
         "-I",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug",
         "-I",
         "/usr/lib/qt/mkspecs/linux-g++",
         "-isystem",
@@ -450,9 +450,9 @@
         "-Wno-unknown-pragmas",
         "-Wno-unknown-warning-option",
         "-Wno-documentation-unknown-command",
-        "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/ui_mainwindow.h"
+        "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/ui_mainwindow.h"
     ],
-    "directory": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.qtc_clangd",
-    "file": "/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/ui_mainwindow.h"
+    "directory": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/../build-M4N3D_app-Desktop-Debug/.qtc_clangd",
+    "file": "/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/ui_mainwindow.h"
 }
 ]

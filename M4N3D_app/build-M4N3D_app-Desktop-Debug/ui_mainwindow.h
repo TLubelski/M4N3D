@@ -75,24 +75,42 @@ public:
     QFormLayout *formLayout;
     QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_6;
+    QSpacerItem *horizontalSpacer_10;
     QLabel *x;
     QLineEdit *xValue;
+    QLabel *label;
+    QSpacerItem *horizontalSpacer_7;
     QHBoxLayout *horizontalLayout;
+    QSpacerItem *horizontalSpacer_11;
     QLabel *y;
     QLineEdit *yValue;
+    QLabel *label_2;
+    QSpacerItem *horizontalSpacer_8;
     QHBoxLayout *horizontalLayout_8;
+    QSpacerItem *horizontalSpacer_12;
     QLabel *z;
     QLineEdit *zValue;
+    QLabel *label_3;
+    QSpacerItem *horizontalSpacer_9;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_11;
+    QSpacerItem *horizontalSpacer_4;
     QLabel *j1;
     QLineEdit *j1Value;
+    QLabel *label_4;
+    QSpacerItem *horizontalSpacer_13;
     QHBoxLayout *horizontalLayout_9;
+    QSpacerItem *horizontalSpacer_5;
     QLabel *j2;
     QLineEdit *j2Value;
+    QLabel *label_5;
+    QSpacerItem *horizontalSpacer_14;
     QHBoxLayout *horizontalLayout_7;
+    QSpacerItem *horizontalSpacer_6;
     QLabel *j3;
     QLineEdit *j3Value;
+    QLabel *label_6;
+    QSpacerItem *horizontalSpacer_15;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -105,13 +123,15 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         widgetControl = new QWidget(centralwidget);
         widgetControl->setObjectName(QString::fromUtf8("widgetControl"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(widgetControl->sizePolicy().hasHeightForWidth());
+        widgetControl->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(widgetControl);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         groupBox_4 = new QGroupBox(widgetControl);
         groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(groupBox_4->sizePolicy().hasHeightForWidth());
         groupBox_4->setSizePolicy(sizePolicy);
         verticalLayout_7 = new QVBoxLayout(groupBox_4);
@@ -226,6 +246,11 @@ public:
 
         widgetInfo = new QWidget(centralwidget);
         widgetInfo->setObjectName(QString::fromUtf8("widgetInfo"));
+        QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(widgetInfo->sizePolicy().hasHeightForWidth());
+        widgetInfo->setSizePolicy(sizePolicy4);
         verticalLayout = new QVBoxLayout(widgetInfo);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         groupBoxConnectivity = new QGroupBox(widgetInfo);
@@ -299,9 +324,13 @@ public:
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_10);
+
         x = new QLabel(groupBox);
         x->setObjectName(QString::fromUtf8("x"));
-        x->setMinimumSize(QSize(35, 0));
+        x->setMinimumSize(QSize(0, 0));
         x->setMaximumSize(QSize(50, 16777215));
         x->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -317,11 +346,24 @@ public:
 
         horizontalLayout_6->addWidget(xValue);
 
+        label = new QLabel(groupBox);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_6->addWidget(label);
+
+        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_7);
+
 
         verticalLayout_3->addLayout(horizontalLayout_6);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer_11);
+
         y = new QLabel(groupBox);
         y->setObjectName(QString::fromUtf8("y"));
         y->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -337,11 +379,24 @@ public:
 
         horizontalLayout->addWidget(yValue);
 
+        label_2 = new QLabel(groupBox);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout->addWidget(label_2);
+
+        horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer_8);
+
 
         verticalLayout_3->addLayout(horizontalLayout);
 
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        horizontalSpacer_12 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_12);
+
         z = new QLabel(groupBox);
         z->setObjectName(QString::fromUtf8("z"));
         z->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -357,6 +412,15 @@ public:
 
         horizontalLayout_8->addWidget(zValue);
 
+        label_3 = new QLabel(groupBox);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        horizontalLayout_8->addWidget(label_3);
+
+        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_9);
+
 
         verticalLayout_3->addLayout(horizontalLayout_8);
 
@@ -367,9 +431,13 @@ public:
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         horizontalLayout_11 = new QHBoxLayout();
         horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_11->addItem(horizontalSpacer_4);
+
         j1 = new QLabel(groupBox);
         j1->setObjectName(QString::fromUtf8("j1"));
-        j1->setMinimumSize(QSize(50, 0));
+        j1->setMinimumSize(QSize(0, 0));
         j1->setMaximumSize(QSize(50, 16777215));
         j1->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -384,11 +452,24 @@ public:
 
         horizontalLayout_11->addWidget(j1Value);
 
+        label_4 = new QLabel(groupBox);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        horizontalLayout_11->addWidget(label_4);
+
+        horizontalSpacer_13 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_11->addItem(horizontalSpacer_13);
+
 
         verticalLayout_5->addLayout(horizontalLayout_11);
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_9->addItem(horizontalSpacer_5);
+
         j2 = new QLabel(groupBox);
         j2->setObjectName(QString::fromUtf8("j2"));
         j2->setMaximumSize(QSize(50, 16777215));
@@ -405,11 +486,24 @@ public:
 
         horizontalLayout_9->addWidget(j2Value);
 
+        label_5 = new QLabel(groupBox);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        horizontalLayout_9->addWidget(label_5);
+
+        horizontalSpacer_14 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_9->addItem(horizontalSpacer_14);
+
 
         verticalLayout_5->addLayout(horizontalLayout_9);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_6);
+
         j3 = new QLabel(groupBox);
         j3->setObjectName(QString::fromUtf8("j3"));
         j3->setMaximumSize(QSize(50, 16777215));
@@ -425,6 +519,15 @@ public:
         j3Value->setReadOnly(true);
 
         horizontalLayout_7->addWidget(j3Value);
+
+        label_6 = new QLabel(groupBox);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        horizontalLayout_7->addWidget(label_6);
+
+        horizontalSpacer_15 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_15);
 
 
         verticalLayout_5->addLayout(horizontalLayout_7);
@@ -460,8 +563,8 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "hr { height: 1px; border-width: 0; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 100 50 20</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 100 -50 20</p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">movej 0 0 100</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
         pushButtonOpen->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
         pushButtonSave->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
         pushButtonHelp->setText(QCoreApplication::translate("MainWindow", "Help", nullptr));
@@ -478,12 +581,18 @@ public:
         pushButtonLogsClear->setText(QCoreApplication::translate("MainWindow", "Clear", nullptr));
         checkBoxDebug->setText(QCoreApplication::translate("MainWindow", "Debug", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "Parameters", nullptr));
-        x->setText(QCoreApplication::translate("MainWindow", "x", nullptr));
-        y->setText(QCoreApplication::translate("MainWindow", "y", nullptr));
-        z->setText(QCoreApplication::translate("MainWindow", "z", nullptr));
-        j1->setText(QCoreApplication::translate("MainWindow", "j1", nullptr));
-        j2->setText(QCoreApplication::translate("MainWindow", "j2", nullptr));
-        j3->setText(QCoreApplication::translate("MainWindow", "j3", nullptr));
+        x->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">X:</span></p></body></html>", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "mm", nullptr));
+        y->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">Y:</span></p></body></html>", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "mm", nullptr));
+        z->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">Z:</span></p></body></html>", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "mm", nullptr));
+        j1->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">J1:</span></p></body></html>", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "deg", nullptr));
+        j2->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">J2:</span></p></body></html>", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "deg", nullptr));
+        j3->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt; font-weight:700;\">J3:</span></p></body></html>", nullptr));
+        label_6->setText(QCoreApplication::translate("MainWindow", "deg", nullptr));
     } // retranslateUi
 
 };

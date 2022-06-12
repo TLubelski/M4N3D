@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = M4N3D_app1.0.0
-DISTDIR = /home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.tmp/M4N3D_app1.0.0
+DISTDIR = /home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/.tmp/M4N3D_app1.0.0
 LINK          = g++
 LFLAGS        = -fPIC
 LIBS          = $(SUBLIBS) /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5SerialPort.so /usr/lib/libQt5Core.so -lGL -lpthread   
@@ -891,7 +891,7 @@ moc_mainwindow.cpp: ../M4N3D_app/inc/mainwindow.hpp \
 		../M4N3D_app/inc/command.hpp \
 		moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app -I/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/inc -I/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/src -I/home/dstronaut/Documents/maned2/M4N3D/M4N3D_app/M4N3D_app/ui -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtSerialPort -I/usr/include/qt/QtCore -I. -I/usr/include/c++/12.1.0 -I/usr/include/c++/12.1.0/x86_64-pc-linux-gnu -I/usr/include/c++/12.1.0/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include-fixed -I/usr/include ../M4N3D_app/inc/mainwindow.hpp -o moc_mainwindow.cpp
+	/usr/bin/moc $(DEFINES) --include /home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/build-M4N3D_app-Desktop-Debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app -I/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/inc -I/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/src -I/home/dstronaut/Documents/Projects/M4N3D/M4N3D_app/M4N3D_app/ui -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtSerialPort -I/usr/include/qt/QtCore -I. -I/usr/include/c++/12.1.0 -I/usr/include/c++/12.1.0/x86_64-pc-linux-gnu -I/usr/include/c++/12.1.0/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/12.1.0/include-fixed -I/usr/include ../M4N3D_app/inc/mainwindow.hpp -o moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
