@@ -73,6 +73,7 @@ void CTRL_stateChangeHandler()
 	}
 	stateMachine.state = stateMachine.newState;
 	stateMachine.stateChanged = false;
+	stateMachine.start = HAL_GetTick();
 }
 
 
@@ -119,6 +120,7 @@ void CTRL_parseCommand()
 	}
 
 	COM_data.available = 0;
+	HAL_Delay(1);
 }
 
 /* ###############################
@@ -127,8 +129,6 @@ void CTRL_parseCommand()
  */
 void CTRL_Loop()
 {
-	uint32_t now = HAL_GetTick();
-
 	if(stateMachine.stateChanged)
 		CTRL_stateChangeHandler();
 
@@ -157,7 +157,7 @@ void CTRL_Loop()
 			break;
 
 		case WAIT:
-			if( now-CommandParams.start > CommandParams.timer )
+			if( HAL_GetTick()-CommandParams.start > CommandParams.timer )
 			{
 				CommandParams.type = IDLE;
 				COM_sendDone();
@@ -166,7 +166,7 @@ void CTRL_Loop()
 
 		case MOVING_L:
 		case MOVING_J:
-			if( KS_Params.target_reached || now-CommandParams.start > CMD_TIMEOUT )
+			if( KS_Params.target_reached || HAL_GetTick()-CommandParams.start > CMD_TIMEOUT )
 			{
 				CommandParams.type = IDLE;
 				COM_sendDone();
@@ -178,7 +178,7 @@ void CTRL_Loop()
 	}
 	else if(stateMachine.state == HALT)
 	{
-		if( PAD.btn_combo_long )
+		if( PAD.btn_combo_long || HAL_GetTick()-stateMachine.start > HALT_TIMEOUT )
 		{
 			print("Resetting position to home");
 			KS_goHome();
